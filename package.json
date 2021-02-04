@@ -1,0 +1,22 @@
+{
+  "name": "root",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "plugins/*",
+    "examples/*",
+    "create-revite-app",
+    "servable"
+  ],
+  "scripts": {
+    "dev": "lerna run tsc --stream --parallel",
+    "demo": "cd examples/basic && yarn dev",
+    "demo-ssr": "cd examples/basic-ssr && yarn dev",
+    "demo:build": "cd examples/basic && yarn build",
+    "demo:start": "cd examples/basic && yarn start",
+    "demo:serve": "cd examples/basic && yarn serve"
+  },
+  "devDependencies": {
+    "lerna": "^3.22.1"
+  }
+}

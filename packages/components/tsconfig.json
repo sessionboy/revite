@@ -1,0 +1,23 @@
+
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "jsx": "react",
+    "target": "es2017",
+    "module": "esnext",
+    "outDir": "./dist",
+    "lib": ["ESNext", "DOM"],
+    "allowJs": true,
+    "allowSyntheticDefaultImports":true
+  },
+  "include": [
+    "./src/"
+  ],
+  "exclude": [
+    "node_modules/",
+    "lib/*.d.ts",
+    "./*.js", 
+    "./*.d.ts"
+  ]
+}
+

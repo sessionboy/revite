@@ -1,0 +1,28 @@
+{
+  "name": "@revite/components",
+  "version": "0.0.1",
+  "description": "> TODO: description",
+  "author": "zhihelive <xzhihe@sina.com>",
+  "homepage": "",
+  "license": "ISC",
+  "main": "dist/index.js",
+  "type": "module",
+  "directories": {
+    "dist": "dist"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "tsc": "tsc"
+  },
+  "dependencies": {
+    "@loadable/component": "^5.14.1",
+    "history": "^5.0.0",
+    "react-router": "^6.0.0-beta.0",
+    "react-router-dom": "^6.0.0-beta.0"
+  },
+  "devDependencies": {
+    "@types/loadable__component": "^5.13.1"
+  }
+}

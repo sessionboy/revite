@@ -1,0 +1,17 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "allowJs": false,
+    "target": "ES2019",
+    "outDir": "dist",
+    "module": "ESNext",
+    "lib": ["ESNext"],
+    "sourceMap": true
+  },
+  "include": ["./src"],
+  "exclude": [
+    "dist/*.d.ts",
+    "node_modules", 
+    "dist"
+  ]
+}

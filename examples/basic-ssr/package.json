@@ -1,0 +1,24 @@
+{
+  "name": "revite-basic-ssr",
+  "version": "1.0.0",
+  "description": "> TODO: description",
+  "author": "zhihelive <xzhihe@sina.com>",
+  "homepage": "",
+  "license": "ISC",
+  "main": "lib/basic.js",
+  "type": "module",
+  "scripts": {
+    "dev": "revite dev",
+    "build": "revite build",
+    "start": "revite start"
+  },
+  "dependencies": {
+    "@material-ui/core": "^4.11.3",
+    "@revite/components": "^0.0.1",
+    "history": "^5.0.0",
+    "react": "16.14.0",
+    "react-dom": "16.14.0",
+    "react-router-dom": "^6.0.0-beta.0",
+    "revite": "^0.0.1"
+  }
+}

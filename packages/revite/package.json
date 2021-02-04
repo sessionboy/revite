@@ -1,0 +1,45 @@
+{
+  "name": "revite",
+  "version": "0.0.1",
+  "description": "> TODO: description",
+  "author": "zhihelive <xzhihe@sina.com>",
+  "homepage": "",
+  "license": "ISC",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "revite": "bin/revite.js"
+  },
+  "files": [
+    "lib"
+  ],
+  "scripts": {
+    "tsc": "tsc"
+  },
+  "dependencies": {
+    "@revite/build": "^0.0.1",
+    "@revite/core": "^0.0.1",
+    "@revite/rollup": "^0.0.1",
+    "@revite/types": "^0.0.1",
+    "@rollup/pluginutils": "^4.1.0",
+    "boxen": "^4.2.0",
+    "cac": "^6.7.1",
+    "consola": "^2.15.0",
+    "cross-spawn": "^7.0.3",
+    "exit": "^0.1.2",
+    "joycon": "^2.2.5",
+    "minimist": "^1.2.5",
+    "optimizer": "^1.8.4",
+    "socket.io": "^3.0.4",
+    "source-map-support": "^0.5.19",
+    "strip-json-comments": "^3.1.1",
+    "wrap-ansi": "^7.0.0",
+    "ws": "^7.4.2"
+  },
+  "devDependencies": {
+    "@types/exit": "^0.1.31",
+    "@types/slash": "^3.0.0",
+    "@types/wrap-ansi": "^3.0.0",
+    "@types/ws": "^7.4.0"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "version": "independent",
+  "packages": [
+    "packages/*",
+    "plugins/*",
+    "examples/*",
+    "create-revite-app",
+    "servable"
+  ],
+  "useWorkspaces": true,
+  "npmClient": "yarn"
+}

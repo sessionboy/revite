@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "target": "ES2019",
+    "outDir": "dist",
+    "module": "esnext", 
+    "lib": ["ESNext"],
+    "resolveJsonModule": true,
+    "sourceMap": true
+  },
+  "files": [
+    "index.d.ts"
+  ]
+}

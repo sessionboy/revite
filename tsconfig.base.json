@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "target": "ES2018",
+    "moduleResolution": "node",
+    "strict": true,
+    "declaration": true,
+    "noUnusedLocals": false,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "watch": true
+  },
+  "no-unused-vars": "off",
+  "exclude": [
+    "node_modules",
+    "dist",
+    "examples/"
+  ]
+}

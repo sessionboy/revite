@@ -1,0 +1,11 @@
+{
+  "name": "@revite/types",
+  "version": "0.0.1",
+  "description": "types of revite",
+  "author": "zhihelive <xzhihe@sina.com>",
+  "license": "ISC",
+  "main": "./index.d.ts",
+  "dependencies": {
+    "@revite/core": "^0.0.1"
+  }
+}
