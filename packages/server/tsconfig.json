@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "target": "ES2019",
+    "jsx": "react",
+    "outDir": "dist",
+    "module": "esnext",
+    "lib": ["ESNext","DOM"],
+    "sourceMap": true
+  },
+  "include": ["./src"],
+  "exclude": [
+    "**/*.copy.ts",
+    "./src/utils"
+  ]
+}
