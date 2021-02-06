@@ -58,17 +58,22 @@ export const getHtmlReactRefreshCode = () =>{
 }
 
 
-export const getStyleHmrCode = (code: string) =>{
-  return `if (typeof document !== 'undefined') {
+export const getStyleHmrCode = (code: string, outputPath: string) =>{
+  return `const code = ${JSON.stringify(code)};
+
+if (typeof document !== 'undefined') {
   // inject-hot-code
-
-  const code = ${JSON.stringify(code)};
-
+  
   const styleEl = document.createElement("style");
   const codeEl = document.createTextNode(code);
   styleEl.type = 'text/css';
   styleEl.appendChild(codeEl);
   document.head.appendChild(styleEl);
+}else{
+  // extract style for ssr
+  if(typeof _ssr_style_ !== 'undefined' && Array.isArray(_ssr_style_)){
+    if(!_ssr_style_.includes(code)) _ssr_style_.push(code);
+  }
 }
   `
 }

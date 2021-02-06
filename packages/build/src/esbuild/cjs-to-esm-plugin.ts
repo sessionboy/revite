@@ -18,16 +18,24 @@ export default (config: ReviteConfig)=>{
         const _module = await import(args.path);
         const module = _module.default||_module;
         let keys = Object.keys(module).join(', ');
-        // if(_module.default){
+        // if(_module.__esModule){
         //   console.log(args, keys,_module.default);
         // }
         const path = JSON.stringify(args.path)
         const _filename = new URL(import.meta.url).pathname;
         const resolveDir = dirname(_filename);
-        // if(_module.default){ // export const { ${keys} } = m;
+        // if(_module.__esModule){ // export const { ${keys} } = m;
         //   return { contents: `import m from ${path};export default m;export { ${keys} } from ${path};`, resolveDir }
         // }else{
-          return { contents: `import * as m from ${path};import { ${keys} } from ${path};export { ${keys} };export default m;`, resolveDir }
+          return { 
+            contents: `
+             import * as m from ${path};
+             import { ${keys} } from ${path};
+             export { ${keys} };
+             export default m;
+            `, 
+            resolveDir 
+          }
         // }        
       })
     }

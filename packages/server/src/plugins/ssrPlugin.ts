@@ -1,34 +1,9 @@
-import { PassThrough } from "stream";
-import path,{ resolve, join, extname } from 'path'
-import { createRequire } from 'module'
-import { ReviteConfig } from '@revite/types'
+import { resolve, extname } from 'path'
 import { parse } from 'url';
-import { readFileSync, existsSync } from 'fs';
+import { existsSync } from 'fs';
 import { ServerPluginContext } from "../types.js"
-import { loadRoutes } from "../services/loadRoutes.js"
-import { mapRoutes } from "../services/mapRoutes.js"
-import { injectHtmlReactRefreshCode } from "../hmr.js"
-import { Routes, ReviteServer } from "@revite/components"
+import { handleRoutes } from "../services/mapRoutes.js"
 import render from "./render.js"
-const require = createRequire(import.meta.url);
-const React = require("react");
-const { renderToString, renderToNodeStream } = require("react-dom/server");
-const { matchRoutes, useRoutes } = require("react-router-dom");
-const { StaticRouter } = require("react-router-dom/server");
-
-const ignorePaths = [
-  "/favicon.ico"
-]
-
-const resolvePath = (root: string, module: string) => resolve(root, module);
-
-// lerna下会找不到
-const resolveNodeModulePath = (root: string, module: string) =>{
-  const moduleDir = join(root,`/node_modules/${module}`);
-  const pkgPath = resolvePath(moduleDir,"package.json");
-  const pkg = require(pkgPath);
-  return resolvePath(moduleDir, pkg.main);
-}
 
 export default (context: ServerPluginContext)=>{
   const config = context.options;
@@ -49,26 +24,11 @@ export default (context: ServerPluginContext)=>{
         return;
       }
 
-      const htmlStream = new PassThrough();
       const result = await import(routesPath);
       const _routes = result.default||result.routes||[];
-      // const matchs = matchRoutes(_routes,pathname);
-      const routes = await Promise.all(mapRoutes(_routes));
+      const { routes, routesData } = await handleRoutes(_routes, pathname);
       const { default: Renderer, Document } = await import(renderPath);
-
-      render({ routes, ctx, config, Document });
-
-      // const element = React.createElement(
-      //   Renderer, 
-      //   { routes, location: ctx.url }
-      // )
-      // const reactStream = renderToNodeStream(element); 
-      // console.log(renderToNodeStream(element));
-     
-      // ctx.type = 'text/html';
-      // reactStream.pipe(htmlStream);
-      // ctx.body = htmlStream;
-      // ctx.body = "html";
+      await render({ ctx, config, routes, routesData, Document });
     }else{
       next()
     }

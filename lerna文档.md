@@ -1,4 +1,9 @@
 
+### 安装依赖
+```
+lerna bootstrap
+```
+
 ### lerna 多文件夹
 假如有文件夹 "packages" 和 "plugins"
 

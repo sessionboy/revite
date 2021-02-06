@@ -1,13 +1,14 @@
-import React from 'react';
+import React,{ useState } from 'react';
 import { Link, Outlet } from "react-router-dom"
 import Sider from "./Sider";
 import logo192 from './logo192.png';
 import "./home.css";
 
 export default function HomePage() {
+  const [count,setCount] = useState(2223);
   return (
     <div className="home">
-     <h3>这里是首页 哈a</h3>
+     <h3>这里是首页 开心啦啦啦</h3>
      <div className="main">
        <div className="content">
         <img src={logo192} className="image" alt="logo" />

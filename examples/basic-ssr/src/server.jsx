@@ -22,18 +22,18 @@ export function Document(props) {
 }
 
 export default ({ routes=[], location })=>{
-  // const [count,setCount] = useState(0);
+  const [count,setCount] = useState(0);
   let route = routes[0];
   console.log(route);
   return (
     <Document>
       <StaticRouter location={location}>
-        {/* <Routes>
+        <Routes>
           <Route
             path={route.path}
             element={ <route.component /> }
           />
-        </Routes> */}
+        </Routes>
         hello world!
       </StaticRouter>
     </Document>

@@ -10,15 +10,20 @@
   "scripts": {
     "dev": "revite dev",
     "build": "revite build",
-    "start": "revite start"
+    "start": "revite start",
+    "server": "nodemon ./ssr.js",
+    "web": "nodemon ./web.js"
   },
   "dependencies": {
-    "@material-ui/core": "^4.11.3",
-    "@revite/components": "^0.0.1",
     "history": "^5.0.0",
-    "react": "16.14.0",
-    "react-dom": "16.14.0",
+    "koa": "^2.13.1",
+    "koa-static": "^5.0.0",
+    "react": "17.0.0",
+    "react-dom": "17.0.0",
     "react-router-dom": "^6.0.0-beta.0",
     "revite": "^0.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.7"
   }
 }

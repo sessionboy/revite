@@ -1,7 +1,4 @@
 import React from 'react';
-// import loadable from '@loadable/component';
-// console.log(loadable);
-// const AsyncComponentLoadable = loadable((props:any) => props.loader());
 
 // 动态加载高阶组件
 export default function asyncComponent(loader:any):any {
@@ -121,7 +118,5 @@ export default function asyncComponent(loader:any):any {
       );
     }
   }
-
-  // SSR.displayName = `asyncComponent SSR(${getDisplayName(Component)})`;
   return SSR;
 }

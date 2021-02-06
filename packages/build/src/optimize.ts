@@ -20,11 +20,13 @@ export const runInitOptimize = async (config:ReviteConfig)=>{
 
   // let initModules = ['react','@revite/components']
   let initModules = ['react', 'react-dom']
-  // if(config.ssr){
-    initModules.push("history");
+  if(config.ssr){
+    initModules.push('react-dom/server'); 
+    initModules.push("history"); 
     initModules.push("react-router-dom");
-    initModules.push("@revite/components");
-  // }
+    initModules.push("react-router-dom/server");
+    // initModules.push("@revite/components");
+  }
   const result = await install(
     initModules,
     {

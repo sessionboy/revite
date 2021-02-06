@@ -23,14 +23,13 @@ export default async () =>{
   await ready(config);
 
   // await runInitOptimize(config);
-  await runLibOptimize(config,[
-    "react",
-    "react-dom",
-    "react-router-dom",
-    "history",
-    "@revite/components",
-    // "@material-ui/core"
-  ])
+  // await runLibOptimize(config,[
+  //   "react",
+  //   "react-dom",
+  //   "react-router-dom",
+  //   "history",
+  //   "@revite/components",
+  // ])
   // return;
 
   // 业务代码

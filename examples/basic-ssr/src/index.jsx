@@ -1,15 +1,16 @@
-import React from "react";
+import React,{ useState } from "react";
 import ReactDom from "react-dom";
 import { BrowserRouter,Router, Routes,Route } from "react-router-dom";
-import { ensureReady, ReviteWeb } from "@revite/components";
+// import { ensureReady, ReviteWeb } from "@revite/components";
 import routes from "./router"
 
 const App = () =>{
+  const [a,b] = useState(0);
   console.log(routes);
   return (
     <div>
       <BrowserRouter>
-        <Router>
+        <Routes>
           {routes.map((route)=>{
             return (
               <Route 
@@ -19,13 +20,13 @@ const App = () =>{
               />
             )
           })}
-        </Router>
+        </Routes>
       </BrowserRouter>
     </div>
   )
 }
  
-ensureReady(routes,async (routes) => {
+// ensureReady(routes,async (routes) => {
   ReactDom.render(
     <App />
     // <React.StrictMode>
@@ -37,7 +38,7 @@ ensureReady(routes,async (routes) => {
     // </React.StrictMode>
     ,document.getElementById('root')
   )
-})
+// })
 
 if (import.meta.hot) {
   import.meta.hot.accept();

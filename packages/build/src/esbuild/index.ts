@@ -53,7 +53,7 @@ export const runLibOptimize = async (
   for (let i = 0; i < outputFiles.length; i++) {
     const module = outputFiles[i];
     const name = basename(module.path).replace(".js",'');
-    console.log(name,module.path);
+    // console.log(name,module.path);
     if(entryPoints.includes(name)){
       const _modulesPath = relative(config.buildOptions.webModulesDir,module.path);
       importMap.imports[name] = _modulesPath[0]==="."?_modulesPath:`./${_modulesPath}`;

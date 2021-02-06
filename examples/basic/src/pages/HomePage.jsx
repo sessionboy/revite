@@ -3,7 +3,7 @@ import logo192 from './logo192.png';
 // import "./home.scss";
 
 const HomePage = () => {
-  // const [count,setCount] = useState(2223)
+  const [count,setCount] = useState(2223)
   // console.log(count);
   return (
     <div className="home">

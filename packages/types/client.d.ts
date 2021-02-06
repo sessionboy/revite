@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 
-export type DynamicComponent = (props: any)=>Promise<ReactNode>;
+export type ReactComponent = React.FC|React.ComponentClass;
+export type DynamicComponent = (props?: any)=>Promise<any>;
 
 export interface Route {
   path: string

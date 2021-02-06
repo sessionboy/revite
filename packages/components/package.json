@@ -14,15 +14,12 @@
     "dist"
   ],
   "scripts": {
-    "tsc": "tsc"
+    "tscc": "tsc"
   },
-  "dependencies": {
-    "@loadable/component": "^5.14.1",
-    "history": "^5.0.0",
-    "react-router": "^6.0.0-beta.0",
+  "peerDependencies": {
+    "history": ">=5",
+    "react": ">=16.8",
+    "react-dom": ">=16.8",
     "react-router-dom": "^6.0.0-beta.0"
-  },
-  "devDependencies": {
-    "@types/loadable__component": "^5.13.1"
   }
 }

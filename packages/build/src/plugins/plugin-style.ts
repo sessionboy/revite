@@ -41,7 +41,7 @@ export default async ({ dispacthError, log }: PluginOptions): Promise<Plugin> =>
     },
     transform: async ({ fileContents, outputPath })=> {
       const _outputPath = outputPath+".proxy.js";
-      const cssHmrCode = getStyleHmrCode(fileContents); 
+      const cssHmrCode = getStyleHmrCode(fileContents,_outputPath); 
 
       if(!existsSync(_outputPath)){
         await ensureFile(_outputPath);

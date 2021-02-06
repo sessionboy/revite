@@ -18,9 +18,11 @@
   },
   "dependencies": {
     "@revite/build": "^0.0.1",
+    "@revite/config": "^0.0.1",
     "@revite/core": "^0.0.1",
     "@revite/rollup": "^0.0.1",
     "@revite/types": "^0.0.1",
+    "@revite/utils": "^0.0.1",
     "@rollup/pluginutils": "^4.1.0",
     "boxen": "^4.2.0",
     "cac": "^6.7.1",

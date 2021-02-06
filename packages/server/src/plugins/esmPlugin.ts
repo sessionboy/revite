@@ -1,7 +1,8 @@
-import { join } from 'path'
+import { join, extname } from 'path'
 import { createRequire } from 'module'
 import { parse } from 'url'
 import { readFileSync } from 'fs';
+import { styleReg } from "@revite/config"
 import LRU from "lru-cache"
 import { ServerPluginContext } from "../types.js"
 import { injectHmrCode } from "../hmr.js"
@@ -42,8 +43,12 @@ export default (context: ServerPluginContext)=>{
 
       let code = contents;     
       if(pathname.endsWith(proxy)){
-        // proxy.js文件不需要babel注入react-refresh
-        code = injectHmrCode(_path, contents);
+        const proxyFile = pathname.replace(proxy,'');
+        const ext = extname(proxyFile);
+        if(styleReg.test(ext)){
+          // 给style proxy注入hmr代码
+          code = injectHmrCode(_path, contents);
+        }        
       }else{
         // 需要babel注入react-refresh
         let result = transformSync(contents, {
