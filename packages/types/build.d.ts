@@ -1,16 +1,7 @@
-import { Revite, ModuleStore } from "@revite/core"
 import { Logger } from "@revite/utils"
-import { ReviteConfig } from "./revite"
+import { InternalConfig } from "./revite"
 import { HMRError } from "./hmr"
 import { servableFn } from "servable"
-
-export interface BuilderOptions {
-  // 构建的目录，通常是src
-  revite: Revite
-  root: string
-  config: ReviteConfig
-  cache: any
-}
 
 export type initFn = (options:any) => Promise<any>
 export type filterFn = (options:any) => boolean
@@ -31,7 +22,7 @@ export interface ResolveResult {
 }
 
 export interface PluginOptions {
-  config: ReviteConfig
+  config: InternalConfig
   cache: any
   log: Logger
   dispacthError: DispacthError

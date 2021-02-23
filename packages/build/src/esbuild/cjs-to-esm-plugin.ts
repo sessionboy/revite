@@ -1,12 +1,12 @@
 import { createRequire } from 'module'
 import { URL } from 'url'
 import { PluginBuild } from 'esbuild'
-import { ReviteConfig } from "@revite/types"
+import { InternalConfig } from "@revite/types"
 import { dirname,join } from 'path'
 const require = createRequire(import.meta.url);
 global.require = require;
 
-export default (config: ReviteConfig)=>{
+export default (config: InternalConfig)=>{
   return {
     name: 'cjs-to-esm',
     setup({ onResolve, onLoad }:PluginBuild) {

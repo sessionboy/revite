@@ -1,6 +1,15 @@
 import fs from "fs"
-import path from "path"
+import { resolve, parse, join, dirname, extname } from "path"
 import { Readable } from 'stream'
+
+export const resolveApp = (...args: string[]) => resolve(...args);
+
+export const getRouteKey = (path:string, parentPath?:string) =>{
+  if(parentPath){
+    return path.startsWith("/") ? `${parentPath}${path}` : `${parentPath}/${path}`
+  }
+  return path;
+}
 
 // 判断是否是裸模块
 export const isBare = (url: string): boolean => {
@@ -50,6 +59,30 @@ export const readBody = async (
   }
 }
 
+export const getFile = (
+  path: string,
+  formats: string[],
+  pathOnly = true
+): string | undefined =>{
+  const isDir = fs.statSync(path).isDirectory();
+  if(isDir){
+    path = resolveApp(path,"index");
+  }
+  for (const format of formats) {
+    const fullPath = join(path, format);
+    if (fs.existsSync(fullPath)) {
+      return pathOnly ? fullPath : fs.readFileSync(fullPath, 'utf-8')
+    }
+  }
+}
+
+export const replaceExt = (path:string, ext: string) =>{
+  const _ext = extname(path);
+  if(_ext === ext) return path;
+  const paths = parse(path);
+  return join(paths.dir, paths.name, ext);
+}
+
 
 export function lookupFile(
   dir: string,
@@ -57,13 +90,17 @@ export function lookupFile(
   pathOnly = false
 ): string | undefined {
   for (const format of formats) {
-    const fullPath = path.join(dir, format)
+    const fullPath = join(dir, format);
     if (fs.existsSync(fullPath) && fs.statSync(fullPath).isFile()) {
       return pathOnly ? fullPath : fs.readFileSync(fullPath, 'utf-8')
     }
   }
-  const parentDir = path.dirname(dir)
+  const parentDir = dirname(dir)
   if (parentDir !== dir) {
     return lookupFile(parentDir, formats, pathOnly)
   }
+}
+
+export function isObject(value: unknown): value is Record<string, any> {
+  return Object.prototype.toString.call(value) === '[object Object]'
 }

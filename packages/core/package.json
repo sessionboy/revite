@@ -7,9 +7,6 @@
   "license": "ISC",
   "main": "dist/index.js",
   "type": "module",
-  "files": [
-    "dist"
-  ],
   "scripts": {
     "tsc": "tsc"
   },

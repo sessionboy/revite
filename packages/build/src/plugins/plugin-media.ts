@@ -1,7 +1,7 @@
 import fsExtra from "fs-extra"
 import { relative } from "path"
 import { Plugin, PluginOptions } from "@revite/types"
-import { mediaReg } from "./config.js"
+import { imageReg } from "@revite/config"
 import mineType from "mime-types"
 const { writeFileSync,readFileSync, existsSync, ensureFile, copyFileSync } = fsExtra;
 
@@ -14,7 +14,7 @@ const cache = new Map();
 export default async ({ config }: PluginOptions): Promise<Plugin> => {
   return {
     name: "@revite/plugin-media",
-    filter: mediaReg,
+    filter: imageReg,
     write: false,
     load: async (filePath: string)=> {     
       let code = "export default $url;"
@@ -22,6 +22,7 @@ export default async ({ config }: PluginOptions): Promise<Plugin> => {
         let url: string = cache.get(filePath);
         if(!url){
           url = toBase64(filePath);
+          cache.set(filePath,url);
         }
         code = `export default "${url}";`
       }
@@ -34,7 +35,7 @@ export default async ({ config }: PluginOptions): Promise<Plugin> => {
     },
     transform: async ({ fileContents, filePath, outputPath })=> {
       const _outputPath = outputPath+".proxy.js";
-      let relativePath = relative(config.buildOptions.clientDir, outputPath);      
+      let relativePath = relative(config.build.clientDir, outputPath);      
       if(!relativePath.startsWith("./")||!relativePath.startsWith("../")){
         relativePath = "/client/" + relativePath;
       }           

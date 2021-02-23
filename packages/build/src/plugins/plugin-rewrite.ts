@@ -19,8 +19,7 @@ export default async ({ config }: PluginOptions): Promise<Plugin> => {
     name: "@revite/plugin-rewrite",
     filter: scriptReg,
     transform: async ({ fileContents, filePath, fileExt, outputPath })=> {
-      const importMapPath = config.buildOptions.importMapJson;
-      const importMapJson = require(importMapPath);
+      const metaJson = require(config.build.metaPath);
       const imports = await scanCodeImportsExports(fileContents);
       let rewrittenCode = fileContents;
       if(imports.length == 0) {
@@ -33,11 +32,11 @@ export default async ({ config }: PluginOptions): Promise<Plugin> => {
         }
         // 裸模块，例如react、react-dom
         if(isBare(spec)){
-          const modulePath = importMapJson.imports[spec];
+          const modulePath = metaJson.imports[spec];
           if(modulePath){
             const relativePath = relative(
               dirname(outputPath),
-              config.buildOptions.webModulesDir
+              config.build.packagesDir
             );
             const _path = join(relativePath, modulePath);            
             rewrittenCode = spliceString(rewrittenCode, _path, _import.s, _import.e);

@@ -8,7 +8,7 @@ export default (context: ServerPluginContext)=>{
   context.app.use(async (ctx,next)=>{   
     const ext = extname(ctx.url);
     if(!scriptReg.test(ext) && !styleReg.test(ext)){
-      const _path = join(config.buildOptions.outputDir,ctx.url);
+      const _path = join(config.build.outputDir,ctx.url);
       ctx.type = ext;
       ctx.body = createReadStream(_path);
     }else {

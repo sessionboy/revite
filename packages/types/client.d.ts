@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, ComponentType } from "react";
 
 export type ReactComponent = React.FC|React.ComponentClass;
 export type DynamicComponent = (props?: any)=>Promise<any>;
@@ -9,6 +9,7 @@ export interface Route {
   component: DynamicComponent
   getInitialProps?: Function
   children?: Route[]
+  Loading?: ComponentType
 }
 
 

@@ -15,7 +15,9 @@
     "web": "nodemon ./web.js"
   },
   "dependencies": {
+    "@revite/components": "^0.0.1",
     "history": "^5.0.0",
+    "isomorphic-fetch": "^3.0.0",
     "koa": "^2.13.1",
     "koa-static": "^5.0.0",
     "react": "17.0.0",

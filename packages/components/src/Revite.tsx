@@ -1,25 +1,20 @@
-import React from "react";
-import { WebContext, ServerContext } from "./context.js";
-import { ReviteServerContext, ReviteWebContext } from "./types.js"
+import React from 'react'
+import { BrowserRouter } from 'react-router-dom'
+import { context, ReviteContext } from "./context.js"
 
-// 顶层组件：客户端的Revite 
-export const ReviteWeb = ({ children, ...rest }: ReviteWebContext)=>{
-  return (
-    <WebContext.Provider 
-      value={ rest } 
-    >
-      { children }
-    </WebContext.Provider>
-  )
+export const ReviteContextProvider: React.FC<{ value: ReviteContext }> = ({
+  value,
+  children,
+}) => {
+  return <context.Provider value={value}>{children}</context.Provider>
 }
 
-// 顶层组件：服务端的Revite
-export const ReviteServer = ({ children, ...rest }: ReviteServerContext) =>{
+export const ReviteBrowser: React.FC = ({ children, context }:any) => {
   return (
-    <ServerContext.Provider 
-      value={ rest } 
-    >
-      { children }  
-    </ServerContext.Provider>
+    <ReviteContextProvider value={context}>
+      <BrowserRouter>
+        {children}
+      </BrowserRouter>
+    </ReviteContextProvider>
   )
 }

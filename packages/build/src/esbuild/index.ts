@@ -1,20 +1,20 @@
 import { join, basename, relative } from "path"
 import fsExtra from "fs-extra"
 import esbuild from "esbuild"
-import { ReviteConfig } from "@revite/types"
+import { InternalConfig } from "@revite/types"
 import cjs_to_esm_plugin from "./cjs-to-esm-plugin.js"
 import resolve_path_plugin from "./resolve-path-plugin.js"
 const { startService } = esbuild;
 const { writeFileSync,existsSync,ensureFileSync } = fsExtra;
 
 export const runLibOptimize = async (
-  config: ReviteConfig, 
+  config: InternalConfig, 
   entryPoints:string[]
 ) =>{
   const start = process.hrtime();
   console.log("start bundle...")
 
-  const metafile = join(config.buildOptions.webModulesDir,"build-meta.json")
+  // const metafile = join(config.build.packagesDir,"build-meta.json")
   const service = await startService();
   const buildResult = await service.build({
     absWorkingDir: config.root,
@@ -32,7 +32,7 @@ export const runLibOptimize = async (
     },
     outbase: '.revite',
     entryPoints,
-    outdir: config.buildOptions.webModulesDir,
+    outdir: config.build.packagesDir,
     define: { 
       'process.env.NODE_ENV': JSON.stringify('development')
     },
@@ -47,7 +47,7 @@ export const runLibOptimize = async (
   } = {
     imports:{}
   }
-  const importMapPath = join(config.buildOptions.webModulesDir, 'import-map.json')
+  const importMapPath = join(config.build.packagesDir, 'import-map.json')
   const { outputFiles=[], warnings } = buildResult;
   // console.log(buildResult);
   for (let i = 0; i < outputFiles.length; i++) {
@@ -55,11 +55,11 @@ export const runLibOptimize = async (
     const name = basename(module.path).replace(".js",'');
     // console.log(name,module.path);
     if(entryPoints.includes(name)){
-      const _modulesPath = relative(config.buildOptions.webModulesDir,module.path);
+      const _modulesPath = relative(config.build.packagesDir,module.path);
       importMap.imports[name] = _modulesPath[0]==="."?_modulesPath:`./${_modulesPath}`;
     }
     if(name === "components"){
-      const _modulesPath = relative(config.buildOptions.webModulesDir,module.path);
+      const _modulesPath = relative(config.build.packagesDir,module.path);
       importMap.imports["@revite/components"] = _modulesPath[0]==="."?_modulesPath:`./${_modulesPath}`;
     }
     if(!existsSync(module.path)){

@@ -1,6 +1,6 @@
 import React from "react";
 
-export function Document(props) {
+export function Document(props:any) {
   return (
     <html lang="en">
       <head>
@@ -8,6 +8,9 @@ export function Document(props) {
         <link rel="icon" href="/favicon.ico" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>React App</title>
+        {/* <Head />
+        <Styles />
+        <ReviteData /> */}
       </head>
       <body>
         <div id="root">

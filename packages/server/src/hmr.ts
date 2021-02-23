@@ -64,17 +64,29 @@ const reactRefreshCode = readFileSync(
     {encoding: 'utf-8'}
   ).replace(`process.env.NODE_ENV`, JSON.stringify('development'));
 
-export const injectHtmlReactRefreshCode = () =>{
-  return `<script>
-  function debounce(e,t){let u;return()=>{clearTimeout(u),u=setTimeout(e,t)}}{
-    const exports = {};
-    ${reactRefreshCode}
-    exports.performReactRefresh = debounce(exports.performReactRefresh, 30);
-    window.$RefreshRuntime$ = exports;
-    window.$RefreshRuntime$.injectIntoGlobalHook(window);
-    window.$RefreshReg$ = () => {};
-    window.$RefreshSig$ = () => (type) => type;
+export const runtimePublicPath = '/@react-refresh';
+export const runtimeCode = `
+const exports = {}
+${reactRefreshCode}
+function debounce(fn, delay) {
+  let handle
+  return () => {
+    clearTimeout(handle)
+    handle = setTimeout(fn, delay)
   }
+}
+exports.performReactRefresh = debounce(exports.performReactRefresh, 30)
+export default exports
+`
+
+export const injectHtmlReactRefreshCode = () =>{
+  return `
+<script type="module">
+  import RefreshRuntime from "${runtimePublicPath}";
+  window.$RefreshRuntime$ = RefreshRuntime;
+  window.$RefreshRuntime$.injectIntoGlobalHook(window);
+  window.$RefreshReg$ = () => {};
+  window.$RefreshSig$ = () => (type) => type;
 </script>
 <script type="module" src="/service/hmr-error-overlay.js"></script>
 `

@@ -1,7 +1,6 @@
-import { Revite, ReviteConfig } from '@revite/types'
+import { InternalConfig } from '@revite/types'
+import { Revite } from '@revite/core'
 import { createRequire } from 'module'
-import { existsSync } from 'fs'
-import { resolve } from 'path'
 import http from 'http'
 import consola from 'consola'
 import Koa from "koa"
@@ -14,7 +13,7 @@ const require = createRequire(import.meta.url);
 
 export default class Server {
   private revite: Revite;
-  private config: ReviteConfig;
+  private config: InternalConfig;
   private app: any;
   private server: HttpServer;
   private context: ServerPluginContext;
@@ -22,7 +21,7 @@ export default class Server {
   private routes: Array<any> = [];
   private renderer: Function = ()=>{};
 
-  constructor (revite: Revite) {
+  constructor (revite: any) {
     this.revite = revite;
     this.config = revite.config;
     this.app = new Koa<State, Context>();
@@ -30,7 +29,6 @@ export default class Server {
       this.app.callback()
     );
     this.plugins = getPlugins(this.config);
-
     // 插件的ctx
     this.context = {
       root: this.config.root||process.cwd(),
@@ -39,7 +37,7 @@ export default class Server {
       routes: this.routes,
       renderer: this.renderer,
       options: this.config,
-      port: this.config.port || 3000
+      port: this.config.server.port
     }
     this._init();
   }
@@ -71,8 +69,8 @@ export default class Server {
     
     consola.info("[revite]: start build optimizer...");
 
-    // const routesPath = resolve(this.revite.config.buildOptions.clientDir,"routes.js");
-    // const appPath = resolve(this.revite.config.buildOptions.clientDir,"App.js");
+    // const routesPath = resolve(this.revite.config.build.clientDir,"routes.js");
+    // const appPath = resolve(this.revite.config.build.clientDir,"App.js");
     // console.log("isexit", existsSync(routesPath));
     // if(existsSync(routesPath)){
     //   const routes = await import(routesPath);
@@ -83,7 +81,7 @@ export default class Server {
     // }
     
     // listen
-    const port = this.config.serverOptions.port||3000;
+    const port = this.config.server.port||3000;
     this.server.listen(port,()=>{
       consola.success("[revite]: listen successfull!");
       consola.success(`http://localhost:${port}`);

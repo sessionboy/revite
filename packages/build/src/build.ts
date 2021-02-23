@@ -1,9 +1,9 @@
 import { join, extname } from "path"
 import fsExtra from "fs-extra"
+import { Revite } from "@revite/core"
 import { getType } from "@revite/utils"
 import { 
-  Revite,
-  ReviteConfig,
+  InternalConfig,
   Plugin, 
   FileContext,
   BuildResult,
@@ -19,7 +19,7 @@ const pluginCaches = new Map<string, Plugin[]>();
 
 export default class Builder {
   private revite: Revite;
-  private config: ReviteConfig;
+  private config: InternalConfig;
   private pluginOptions: PluginOptions;
   private plugins: Plugin[] = [];
 
@@ -78,7 +78,7 @@ export default class Builder {
         return Promise.resolve(null);
       }
       const write = loadPlugin.write;
-      const outputDir = this.config.buildOptions.clientDir;
+      const outputDir = this.config.build.clientDir;
       const { relativePath } = this.relativePath(filePath, outputExt)          
       let outputPath = join(outputDir, relativePath);          
 
@@ -103,7 +103,7 @@ export default class Builder {
           fileContext = Object.assign(fileContext,result);
         }        
       }
-      const accessPath = fileContext.outputPath.replace(this.config.buildOptions.outputDir,'');
+      const accessPath = fileContext.outputPath.replace(this.config.build.outputDir,'');
       
       // 5，输出文件
       if(write){
@@ -113,17 +113,6 @@ export default class Builder {
         writeFileSync(outputPath, fileContext.fileContents);
       }
 
-      // 缓存构建结果
-      if(!this.revite.store.has(filePath)){
-        this.revite.store.set(filePath, {
-          id: filePath,
-          fileExt: fileContext.fileExt,
-          outputPath: fileContext.outputPath,
-          outputExt: fileContext.outputExt,
-          relativePath: fileContext.relativePath
-        })
-      }
-         
       return {
         ...fileContext,
         accessPath
@@ -136,7 +125,7 @@ export default class Builder {
 
     copySync(
       this.config.publicPath, 
-      this.config.buildOptions.outputDir,
+      this.config.build.outputDir,
       {
         filter: (src)=>!src.endsWith(".html")
       }

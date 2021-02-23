@@ -3,9 +3,9 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "jsx": "react",
-    "target": "es2017",
+    "target": "esnext",
     "module": "esnext",
-    "outDir": "./dist",
+    "outDir": "dist",
     "lib": ["ESNext", "DOM"],
     "allowJs": true,
     "allowSyntheticDefaultImports":true

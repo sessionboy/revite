@@ -1,23 +1,52 @@
-import path,{ extname } from 'path'
+import { extname } from 'path'
 import { parse } from 'url';
-import { readFileSync } from 'fs';
+import { InternalConfig } from '@revite/types';
 import { ServerPluginContext } from "../types.js"
-import { injectHtmlReactRefreshCode } from "../hmr.js"
+import { runtimeCode, runtimePublicPath } from "../hmr.js"
+import ssrRender from "../ssr/ssrRender.js"
+import spaRender from "../ssr/spaRender.js"
+
+export interface RenderProps {
+  ctx: any
+  context: ServerPluginContext
+  config: InternalConfig
+  url: string
+  pathname: string,
+  isProd: boolean
+}
 
 export default (context: ServerPluginContext)=>{
   const config = context.options;
+  const isProd = process.env.NODE_ENV === "production";
+
   context.app.use(async (ctx,next)=>{
     const url = parse(ctx.url);
     const pathname = url.pathname||"";     
-    if(pathname == "/" || !extname(pathname)){            
-      const htmlPath = path.join(config.publicPath, "/index.html");
-      let html = readFileSync(htmlPath,"utf-8");
-      const reactRefreshCode = injectHtmlReactRefreshCode();
-      html = html.replace(/<body.*?>/,reactRefreshCode);
-      ctx.type = 'text/html';
-      ctx.body = html;
-    }else{
+
+    // /@react-refresh
+    if(pathname == runtimePublicPath && !isProd){
+      ctx.type = 'js';
+      ctx.body = runtimeCode;
+      return;
+    }
+
+    if(pathname == "/" || !extname(pathname)){    
+      const renderProps: RenderProps = {
+        ctx,
+        context,
+        config,
+        url: ctx.url,
+        pathname,
+        isProd
+      }  
+      if(config.ssr){
+        await ssrRender(renderProps);
+      }else{
+        await spaRender(renderProps);
+      }      
+    } else {
       next()
     }
+
   })
 }

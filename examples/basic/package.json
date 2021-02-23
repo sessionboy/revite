@@ -12,6 +12,7 @@
     "start": "revite start"
   },
   "dependencies": {
+    "@revite/components": "^0.0.1",
     "koa": "^2.13.1",
     "revite": "^0.0.1"
   }

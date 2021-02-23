@@ -19,6 +19,7 @@
   "dependencies": {
     "@babel/core": "^7.12.10",
     "@revite/config": "^0.0.1",
+    "@revite/core": "^0.0.1",
     "@revite/types": "^0.0.1",
     "@revite/utils": "^0.0.1",
     "es-module-lexer": "^0.3.26",

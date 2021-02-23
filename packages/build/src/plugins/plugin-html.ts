@@ -21,7 +21,7 @@ export default async ({ config }: PluginOptions): Promise<Plugin> => {
       const code = getHtmlReactRefreshCode();
       fileContents = fileContents.replace(/<body.*?>/,code);
       
-      const _outputPath = join(config.buildOptions.outputDir,basename(filePath));
+      const _outputPath = join(config.build.outputDir,basename(filePath));
       writeFileSync(_outputPath, fileContents);
       return { fileContents, outputPath: _outputPath };
     }

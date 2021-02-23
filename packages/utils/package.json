@@ -21,7 +21,8 @@
     "fs-extra": "^9.0.1",
     "lru-cache": "^6.0.0",
     "mime-types": "^2.1.27",
-    "resolve": "^1.19.0"
+    "resolve": "^1.19.0",
+    "resolve.exports": "^1.0.2"
   },
   "devDependencies": {
     "@types/fs-extra": "^9.0.5",

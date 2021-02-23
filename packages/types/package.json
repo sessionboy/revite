@@ -5,7 +5,9 @@
   "author": "zhihelive <xzhihe@sina.com>",
   "license": "ISC",
   "main": "./index.d.ts",
-  "dependencies": {
-    "@revite/core": "^0.0.1"
+  "types": "./index.d.ts",
+  "dependencies": {},
+  "devDependencies": {
+    "http-proxy": "^1.18.1"
   }
 }

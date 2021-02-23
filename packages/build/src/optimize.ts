@@ -1,5 +1,6 @@
 import { join } from 'path';
-import { ReviteConfig } from "@revite/types"
+import chalk from 'chalk'
+import { InternalConfig } from "@revite/types"
 import ora from "ora"
 import { install } from 'esinstall';
 import { createRequire } from 'module';
@@ -11,27 +12,42 @@ const ignoreModules = [
   "revite"
 ]
 
-export const runInitOptimize = async (config:ReviteConfig)=>{
+export const runInitOptimize = async (config:InternalConfig,log?:any)=>{
   const start = process.hrtime();
   const spinner = ora('start optimizeing...').start();  
+  // Dependency cache out of date. Updating...
+  log.info(
+    chalk.yellow(
+      '! installing dependencies...' 
+    )
+  );
   // const pkg = require(paths.appPackageJson);
   // const dependencies = pkg.dependencies||{};
   // const optimizeLists = Object.keys(dependencies).filter(i=>!ignoreModules.includes(i))
 
-  // let initModules = ['react','@revite/components']
-  let initModules = ['react', 'react-dom']
+  let initModules: string[] = [
+    'react', 
+    'react-dom',
+    "history",
+    "react-router-dom",
+    "@revite/components"
+  ]
   if(config.ssr){
-    initModules.push('react-dom/server'); 
-    initModules.push("history"); 
-    initModules.push("react-router-dom");
-    initModules.push("react-router-dom/server");
-    // initModules.push("@revite/components");
+    initModules = [
+      'react', 
+      'react-dom',
+      'react-dom/server',
+      "history",
+      "react-router-dom",
+      "react-router-dom/server",
+      "@revite/components"
+    ]
   }
   const result = await install(
     initModules,
     {
       cwd: config.root,
-      dest: config.buildOptions.webModulesDir,
+      dest: config.build.packagesDir,
       polyfillNode: true
     }
   );
@@ -52,7 +68,7 @@ export const runOptimize = async (modules:Array<string>, config:any) =>{
     modules,
     {
       cwd: config.root,
-      dest: config.buildOptions.webModulesDir
+      dest: config.build.packagesDir
       // lockfile: newLockfile || undefined,
     }
   );

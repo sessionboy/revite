@@ -20,10 +20,12 @@ const cache = new LRU<string, string>();
 
 export default (context: ServerPluginContext)=>{
   const config = context.options;
+  const isProd = process.env.NODE_ENV === "production";
+
   context.app.use(async (ctx,next)=>{
     const pathname = parse(ctx.url).pathname||"";
     if(pathname.endsWith(".js")){
-      const _path = join(config.buildOptions.outputDir,pathname);
+      const _path = join(config.build.outputDir,pathname);
       let contents = readFileSync(_path, "utf-8"); 
       ctx.type = 'js';
       
@@ -35,7 +37,7 @@ export default (context: ServerPluginContext)=>{
       }
 
       // 裸模块和service不需要注入hmr代码
-      if(ignorePaths.includes(pathname) || pathname.includes("web-modules")){
+      if(ignorePaths.includes(pathname) || pathname.includes("/@packages")){
         cache.set(contents, contents);
         ctx.body = contents;        
         return;
@@ -45,11 +47,11 @@ export default (context: ServerPluginContext)=>{
       if(pathname.endsWith(proxy)){
         const proxyFile = pathname.replace(proxy,'');
         const ext = extname(proxyFile);
-        if(styleReg.test(ext)){
+        if(styleReg.test(ext) && !isProd){
           // 给style proxy注入hmr代码
           code = injectHmrCode(_path, contents);
         }        
-      }else{
+      }else if(!isProd){
         // 需要babel注入react-refresh
         let result = transformSync(contents, {
           ast: false,

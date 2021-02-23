@@ -1,5 +1,5 @@
 import { createRequire } from "module"
-import { Plugin, ReviteConfig, PluginOptions } from "@revite/types"
+import { Plugin, InternalConfig, PluginOptions } from "@revite/types"
 import { scriptReg } from "./config.js"
 import { getHmrCode } from "./util.js"
 

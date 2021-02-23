@@ -1,42 +1,25 @@
-import dynamic from "./dynamic.js";
-import { Route } from "./types.js"
-import { matchRoutes } from './imports.js'
+import { handleRoutes } from "./handleRoutes";
+import { ReviteContext } from "./context.js"
 
-const mapRoutes = (routes: Route[], parentPath?: string) =>{
-  return routes.map((route: Route)=>{
-    let key = route.path;
-    if(parentPath){
-      key = key.startsWith("/") ? `${parentPath}${key}` : `${parentPath}/${key}`
-    }
-    if(route.children && route.children.length>0){
-      const children: Route[] = mapRoutes(route.children, key);
-      return {
-        ...route,
-        key,
-        children,        
-        component: dynamic(route.component),        
-      }
-    }else{
-      return {
-        ...route,
-        key,
-        component: dynamic(route.component) 
-      }
-    }   
-  })
-}
+export const ensureReady = async(callback: Function)=> {
+  const revite = (window as any).__REVITE_DATA__||{};
+  const routesPath = revite.routesPath||"/client/routes.js";
 
-export default async(
-  routes:any = [],
-  callback: Function
-)=> {
-  routes = mapRoutes(routes);
-  const matchs = matchRoutes(routes, window.location.pathname)||[];
-  await Promise.all(matchs.map((route:any)=>{
-    if(route.component && route.component.load){
-      return route.component.load();
-    }
-    return undefined;
-  }))
-  callback(routes);
+  let { default: _routes =[], Loading } = await import(routesPath);
+  const { routesData, store } = revite;
+
+  const routes = await handleRoutes({
+    routes: _routes,
+    pathname: window.location.pathname,
+    Loading,
+    routesData
+  });
+
+  console.log("routes",routes);
+  const context: ReviteContext = {
+    routes,
+    routesData,
+    store
+  }
+  callback(context);
 }

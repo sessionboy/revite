@@ -3,21 +3,6 @@ import { URL } from "url"
 import qs, { ParsedUrlQuery } from 'querystring'
 import resolve from 'resolve'
 
-let isRunningWithYarnPnp: boolean
-try {
-  isRunningWithYarnPnp = Boolean(require('pnpapi'))
-} catch {}
-
-export const supportedExts = ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json']
-
-export const resolveFrom = (root: string, id: string) =>
-  resolve.sync(id, {
-    basedir: root,
-    extensions: supportedExts,
-    // necessary to work with pnpm
-    preserveSymlinks: isRunningWithYarnPnp || false
-  })
-
 export const queryRE = /\?.*$/
 export const hashRE = /#.*$/
 
@@ -42,7 +27,6 @@ export const cleanUrl = (url: string) =>
 //     query: {}
 //   }
 // }
-export const bareImportRE = /^[^\/\.]/
 
 const externalRE = /^(https?:)?\/\//
 export const isExternalUrl = (url: string) => externalRE.test(url)

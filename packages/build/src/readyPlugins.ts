@@ -21,7 +21,7 @@ export default async (
     mediaPlugin,
     esmPlugin, 
     rewritePlugin, 
-    ...config.buildOptions.plugins
+    ...config.build.plugins
   ];    
   
   const _plugins = await Promise.all(

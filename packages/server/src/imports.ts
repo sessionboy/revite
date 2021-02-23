@@ -1,21 +1,40 @@
-import { join } from "path"
-import { ReviteConfig } from "@revite/types"
+import { createRequire } from "module"
+import { resolve } from "path"
+import { InternalConfig } from "@revite/types"
 
-export default async (config: ReviteConfig)=>{
+const require = createRequire(import.meta.url);
+const modulesMap = new Map();
+
+export default async (config: InternalConfig)=>{
   try {
+    let cacheModules = modulesMap.get("modules");
+    if(cacheModules) return cacheModules;
+
+    const packagesDir = config.build.packagesDir;
+    let imports = modulesMap.get("imports");
+    if(!imports){
+      const meta = require(config.build.metaPath);
+      imports = meta.imports;
+      modulesMap.set("imports",imports);
+    }
+    
     const React = await import(
-      join(config.buildOptions.webModulesDir,"/react.js")
+      resolve(packagesDir, imports.react)
     );
+
     const { renderToString, renderToNodeStream } = await import(
-      join(config.buildOptions.webModulesDir,"/react-dom/server.js")
+      resolve(packagesDir, imports["react-dom/server"])
     );
+
     const { Routes, Route, useRoutes } = await import(
-      join(config.buildOptions.webModulesDir,"/react-router-dom.js")
+      resolve(packagesDir, imports["react-router-dom"])
     );
+
     const { StaticRouter } = await import(
-      join(config.buildOptions.webModulesDir,"/react-router-dom/server.js")
+      resolve(packagesDir, imports["react-router-dom/server"])
     );
-    return {
+
+    const modules = {
       React,
       renderToString,
       renderToNodeStream,
@@ -24,9 +43,11 @@ export default async (config: ReviteConfig)=>{
       Routes, 
       Route
     }
+
+    modulesMap.set("modules", modules);
+    return modules;
+
   } catch (error) {
-    console.log("error",error);
-    console.log("error::message",error.message);
     throw error;
   }
 }

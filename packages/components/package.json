@@ -14,12 +14,13 @@
     "dist"
   ],
   "scripts": {
-    "tscc": "tsc"
+    "tsc": "tsc"
   },
   "peerDependencies": {
     "history": ">=5",
     "react": ">=16.8",
     "react-dom": ">=16.8",
     "react-router-dom": "^6.0.0-beta.0"
-  }
+  },
+  "dependencies": {}
 }

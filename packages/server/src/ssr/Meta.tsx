@@ -1,6 +1,6 @@
 import React from "react";
 
-export function Document(props) {
+export function Meta(props:any) {
   return (
     <html lang="en">
       <head>
@@ -17,14 +17,4 @@ export function Document(props) {
       </body>
     </html>
   )
-}
-
-// 全局初始数据
-export const getInitialProps = () =>{
-  return {
-    user:{
-      name:"jack",
-      age: 23
-    }
-  }
 }

@@ -1,35 +1,29 @@
 
 export const Loading = () =>{
-  return "loading...."
+  return "loading....23333"
 }
 
 export default [
   {
     path: '/',
-    key: "/",
-    component: ()=> import("./pages/HomePage"),
-    // loadData: ()=>{}
+    component: ()=> import("./pages/HomePage")
   },
   {
     path: '/concat',
-    key: "/concat",
     component: ()=> import("./pages/ConcatPage") 
   },
   {
     path: '/about',
-    key: "/about",
     component: ()=> import("./pages/AboutPage"),
     children:[
       {
         path: ':child',
-        key: "/about/:child",
         component: ()=> import("./pages/Child"),
       }
     ] 
   },
   {
     path: '*',
-    key: "*",
     component: ()=> import("./pages/404")
   },
 ];

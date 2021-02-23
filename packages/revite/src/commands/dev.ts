@@ -5,13 +5,13 @@ import WebSocket from "../notification.js"
 import ready from "../ready.js"
 import createWatcher from "../watch.js" 
 import { createCache } from "@revite/utils"
-import { ReviteConfig, BuildResult } from "@revite/types"
+import { InternalConfig, BuildResult } from "@revite/types"
 import { runLibOptimize, runInitOptimize, Builder } from "@revite/build"
 
 const cache = createCache();
 export default async () =>{
   
-  const config: ReviteConfig = await getReviteConfig({});
+  const config: InternalConfig = await getReviteConfig({});
   const revite = new Revite(config);
   const log = revite.log;
 
@@ -22,11 +22,14 @@ export default async () =>{
   // 准备工作
   await ready(config);
 
-  // await runInitOptimize(config);
+  // console.log("config", config);
+  await runInitOptimize(config,log);
   // await runLibOptimize(config,[
   //   "react",
   //   "react-dom",
+  //   'react-dom/server',
   //   "react-router-dom",
+  //   "react-router-dom/server",
   //   "history",
   //   "@revite/components",
   // ])
@@ -52,29 +55,20 @@ export default async () =>{
 
   // 应用初始构建
   const buildResult: BuildResult[] = await builder.build(buildFiles);
-  // if(config.ssr){
-  //   if(config.ssr.routes && !buildFiles.includes(config.ssr.routes)){
-  //     buildFiles.push(config.ssr.routes);
-  //   }
-  //   if(config.ssr.layout && !buildFiles.includes(config.ssr.layout)){
-  //     buildFiles.push(config.ssr.layout);
-  //   }
-  //   const buildResult: BuildResult[] = await builder.build(buildFiles,"node");
-  // }
-
+  
   // 通知客户端
-  revite.subscribe("notification:hmr", async (options) =>{
+  revite.subscribe("notification:hmr", async (options:any) =>{
     ws.send(options);
   })
 
   // 打包裸模块
-  revite.subscribe("build:module", async (options)=>{
+  revite.subscribe("build:module", async (options:any)=>{
     await runInitOptimize(config);
     // await runOptimize(options);
   })
 
   // 打包业务代码
-  revite.subscribe("build:general", async ({ file, fileLoc, type }) =>{
+  revite.subscribe("build:general", async ({ file, fileLoc, type }:any) =>{
     const buildResult: BuildResult[] = await builder.build([file]);
     const { accessPath } = buildResult[0];
     if(type==="add"){
