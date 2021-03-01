@@ -1,5 +1,5 @@
 import React from 'react'
-import { BrowserRouter } from 'react-router-dom'
+import { BrowserRouter } from "react-router-dom";
 import { context, ReviteContext } from "./context.js"
 
 export const ReviteContextProvider: React.FC<{ value: ReviteContext }> = ({

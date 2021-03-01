@@ -12,6 +12,10 @@ export interface ReviteConfig {
   */
   htmlPath?: string
   /**
+   * hmr相关配置
+  */
+  hmr?: HmrOptions
+  /**
    * ssr相关配置项
   */
   ssr?:{
@@ -63,7 +67,10 @@ export interface InternalConfig {
   appSrc: string
   publicPath: string
   packageJson: string
+  nodeModulesDir: string
   htmlPath: string
+  hooksDir: string
+  hmr: HmrOptions
   ssr?: {
     mode: "stream"|"general"
     routeType: "config"|"file"
@@ -113,13 +120,23 @@ export interface InternalConfig {
     */
     packagesDir: string
     /** 
+      * 构建时输出的metafile
+      * @default build-map.json.
+    */
+    buildMap: string
+    /** 
+      * 构建时输出的metafile
+      * @default output/packagesDir/build-map.json.
+    */
+    buildMapPath: string
+    /** 
       * 构建的meta路径，相对于outputDir
-      * @default output/packagesDir/import-map.json.
+      * @default output/packagesDir/meta.json.
     */
     meta: string
     /** 
       * 构建的meta.json文件绝对路径
-      * @default outputDir/packagesDir/import-map.json.
+      * @default outputDir/packagesDir/meta.json.
     */
     metaPath: string
     /** 
@@ -154,4 +171,12 @@ export interface InternalConfig {
   }
 }
 
+export interface HmrOptions {
+  protocol?: string
+  host?: string
+  port?: number
+  path?: string
+  timeout?: number
+  overlay?: boolean
+}
 

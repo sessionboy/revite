@@ -5,6 +5,8 @@
 
 const isWindowDefined = typeof window !== 'undefined';
 
+//hmr-options
+
 function log(...args) {
   console.log('[REVITE-HMR]', ...args);
 }
@@ -46,16 +48,22 @@ function sendSocketMessage(msg) {
   }
 }
 
-let socketURL = isWindowDefined && window.HMR_WEBSOCKET_URL;
-if (!socketURL) {
-  const socketHost =
-    isWindowDefined && window.HMR_WEBSOCKET_PORT
-      ? `${location.hostname}:${window.HMR_WEBSOCKET_PORT}`
-      : location.host;
-  socketURL = (location.protocol === 'http:' ? 'ws://' : 'wss://') + socketHost + '/';
-}
+const defines = window.defines||{};
+const socketProtocol =
+  defines.protocol || (location.protocol === 'https:' ? 'wss' : 'ws')
+const socketHost = `${defines.protocol || location.hostname}:${defines.port}`
+const socket = new WebSocket(`${socketProtocol}://${socketHost}`, 'revite-hmr')
 
-const socket = new WebSocket(socketURL, 'revite-hmr');
+// let socketURL = isWindowDefined && window.HMR_WEBSOCKET_URL;
+// if (!socketURL) {
+//   const socketHost =
+//     isWindowDefined && window.HMR_WEBSOCKET_PORT
+//       ? `${location.hostname}:${window.HMR_WEBSOCKET_PORT}`
+//       : location.host;
+//   socketURL = (location.protocol === 'http:' ? 'ws://' : 'wss://') + socketHost + '/';
+// }
+// const socket = new WebSocket(socketURL, 'revite-hmr');
+
 socket.addEventListener('open', () => {
   SOCKET_MESSAGE_QUEUE.forEach(_sendSocketMessage);
   SOCKET_MESSAGE_QUEUE = [];

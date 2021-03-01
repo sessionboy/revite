@@ -22,13 +22,20 @@
     "@revite/types": "^0.0.1",
     "@revite/utils": "^0.0.1",
     "chokidar": "^3.4.3",
+    "compression": "^1.7.4",
+    "connect": "^3.7.0",
+    "etag": "^1.8.1",
     "koa": "^2.13.0",
     "koa-static": "^5.0.0",
     "lru-cache": "^6.0.0",
     "mime-types": "^2.1.28",
-    "node-fetch": "^2.6.1"
+    "node-fetch": "^2.6.1",
+    "selfsigned": "^1.10.8",
+    "serve-static": "^1.14.1"
   },
   "devDependencies": {
+    "@types/compression": "^1.7.0",
+    "@types/etag": "^1.8.0",
     "@types/koa": "^2.11.6",
     "@types/koa-static": "^4.0.1",
     "@types/node-fetch": "^2.5.8"

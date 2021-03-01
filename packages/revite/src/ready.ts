@@ -1,4 +1,4 @@
-import { join } from "path"
+import { join, dirname } from "path"
 import { URL } from "url"
 import { createRequire } from "module"
 import fsExtra from "fs-extra"
@@ -7,26 +7,12 @@ const { copySync, ensureDir, ensureFile, existsSync, readFileSync, writeFileSync
 const require = createRequire(import.meta.url);
 
 const pkg = require("../package.json");
+const _dirname = dirname(new URL(import.meta.url).pathname);
 
 export default async (config: InternalConfig)=>{
 
-  // 输出service文件
-  let update: boolean = false;
-  const versionPath = join(config.build.serviceDir,"/version.txt");
-  if(!existsSync(config.build.serviceDir)){
-    await ensureDir(config.build.serviceDir);
-    update = true;
-  }else{
-    const version = readFileSync(versionPath);
-    if(version !== pkg.version){
-      update = true;
-    }
-  }
-  if(update){
-    const clientDir = new URL("../client/",import.meta.url).pathname;
-    copySync(clientDir, config.build.serviceDir);
-    await ensureFile(versionPath);
-    writeFileSync(versionPath,pkg.version);
-  }
+  // 检查工作，
+  // 比如react>= 17.0，react-router >= 6.0， type=module
+  // await fs.writeFile(config.packageJson, '{"type": "module"}')
   
 }

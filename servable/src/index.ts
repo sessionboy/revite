@@ -1,74 +1,162 @@
+import { serial, flatHooks, mergeHooks, isObject } from './utils.js'
+import { LoggerT, hookFnT, configHooksT, deprecatedHookT, deprecatedHooksT } from './types.js'
+export * from './types.js'
 
-export type servableFn = (...args: any) => Promise<any> | void;
+class Servable {
+  private _hooks: { [name: string]: hookFnT[] }
+  private _deprecatedHooks: deprecatedHooksT
+  private _logger: LoggerT | false
 
-export interface servableSet {
-  [name: string]: servableFn[]
-}
+  static mergeHooks: typeof mergeHooks
+  mergeHooks: typeof mergeHooks|null = null
 
-export function serial<T> (tasks: T[], fn: (task: T) => Promise<any> | any) {
-  return tasks.reduce((promise, task) => promise.then(async () => fn(task)), Promise.resolve(null))
-}
+  constructor (logger: LoggerT | false = console) {
+    this._logger = logger
+    this._hooks = {}
+    this._deprecatedHooks = {}
 
-export default class Servable {
-  private subscribers: servableSet = {};
-
-  constructor(){
-    this.subscribers = {}
+    // Allow destructuring hook and callHook functions out of instance object
+    this.hook = this.hook.bind(this)
+    this.callHook = this.callHook.bind(this)
   }
 
-  // 检查是否已订阅
-  hasSubscribe(type: string): boolean{
-    return Boolean(this.subscribers[type]?.[0]);
+  hasHook(name: string): boolean{
+    return Boolean(this._hooks[name]?.[0]);
   }
 
-  subscribe(type: string, fn: servableFn) {
-    if (!type || typeof fn !== 'function') {
+  hook (name: string, fn: hookFnT|null) {
+    if (!name || typeof fn !== 'function') {
       return () => {}
     }
-    this.subscribers[type] = this.subscribers[type] || [];
-    this.subscribers[type].push(fn);
-  
+
+    const originalName = name
+    let deprecatedHook
+    while (this._deprecatedHooks[name]) {
+      deprecatedHook = this._deprecatedHooks[name]
+      if (typeof deprecatedHook === 'string') {
+        deprecatedHook = { to: deprecatedHook }
+      }
+      name = deprecatedHook.to
+    }
+    if (deprecatedHook && this._logger) {
+      if (!deprecatedHook.message) {
+        this._logger.warn(
+          `${originalName} hook has been deprecated` +
+          (deprecatedHook.to ? `, please use ${deprecatedHook.to}` : '')
+        )
+      } else {
+        this._logger.warn(deprecatedHook.message)
+      }
+    }
+
+    this._hooks[name] = this._hooks[name] || []
+    this._hooks[name].push(fn)
+
     return () => {
       if (fn) {
-        this.unsubscribe(type, fn)
+        this.removeHook(name, fn)
         fn = null // Free memory
       }
     }
   }
 
-  unsubscribe(type: string, fn: servableFn) {
-    if (this.subscribers[type]) {
-      const index = this.subscribers[type].indexOf(fn)
+  hookOnce (name: string, fn: hookFnT) {
+    let _unreg:any;
+    let _fn: any = (...args:any) => {
+      _unreg()
+      _unreg = null
+      _fn = null
+      return fn(...args)
+    }
+    _unreg = this.hook(name, _fn)
+    return _unreg
+  }
 
-      if (index !== -1) {
-        this.subscribers[type].splice(index, 1)
+  removeHook (name: string, fn: hookFnT) {
+    if (this._hooks[name]) {
+      const idx = this._hooks[name].indexOf(fn)
+
+      if (idx !== -1) {
+        this._hooks[name].splice(idx, 1)
       }
 
-      if (this.subscribers[type].length === 0) {
-        delete this.subscribers[type]
+      if (this._hooks[name].length === 0) {
+        delete this._hooks[name]
       }
     }
   }
 
-  async dispacth(type: string, payload?:any, isSerial?: boolean) {
-    if (!this.subscribers[type]) {
-      return
-    }
-
-    let results = [];
-    const tasks = this.subscribers[type];
-
-    if(isSerial){
-      // 串行执行，直至最后一个
-      await serial(tasks, async (fn: servableFn) => results.push(await fn(payload)) )
-    }
-
-    // 默认为并行执行
-    results = await Promise.all(
-      tasks.map((fn: servableFn)=>fn(payload))
-    )
-
-    return results;
+  deprecateHook (name: string, deprecated: deprecatedHookT) {
+    this._deprecatedHooks[name] = deprecated
   }
 
+  deprecateHooks (deprecatedHooks: deprecatedHooksT) {
+    Object.assign(this._deprecatedHooks, deprecatedHooks)
+  }
+
+  addHooks (configHooks: configHooksT) {
+    const hooks = flatHooks(configHooks)
+    const removeFns = Object.keys(hooks).map(key => this.hook(key, hooks[key]))
+
+    return () => {
+      // Splice will ensure that all fns are called once, and free all
+      // unreg functions from memory.
+      removeFns.splice(0, removeFns.length).forEach(unreg => unreg())
+    }
+  }
+
+  removeHooks (configHooks: configHooksT) {
+    const hooks = flatHooks(configHooks)
+    for (const key in hooks) {
+      this.removeHook(key, hooks[key])
+    }
+  }
+
+  async callHook (name: string, ...args: any) {
+    const tasks = this._hooks[name];
+    if (!tasks) return;
+    try {
+      const results = await serial(tasks, fn => fn(...args));
+      if(isObject(results)) return results;
+      return results?.[0];
+    } catch (err) {
+      if (name !== 'error') {
+        await this.callHook('error', err)
+      }
+      if (this._logger) {
+        if (this._logger.fatal) {
+          this._logger.fatal(err)
+        } else {
+          this._logger.error(err)
+        }
+      }
+    }
+  }
+
+  async callParallelHook (name: string, ...args: any) {
+    const tasks = this._hooks[name];
+    if (!tasks) return;
+    try {
+      const results = await Promise.all(
+        tasks.map((fn: hookFnT)=>fn(...args))
+      )
+      return results?.[0];
+    } catch (err) {
+      if (name !== 'error') {
+        await this.callHook('error', err)
+      }
+      if (this._logger) {
+        if (this._logger.fatal) {
+          this._logger.fatal(err)
+        } else {
+          this._logger.error(err)
+        }
+      }
+    }
+  }
 }
+
+Servable.mergeHooks = mergeHooks
+Servable.prototype.mergeHooks = mergeHooks
+
+export default Servable

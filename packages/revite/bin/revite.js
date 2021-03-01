@@ -2,6 +2,12 @@
 import { createRequire } from "module"
 global.require = createRequire(import.meta.url);
 
+/*
+  * 表示程序由cli启动，而不是自定义server，
+  * 这用于区别cli 和 custom server非常有用
+*/ 
+process.env.CLI = true;
+
 import '../dist/cli.js';
 
 // import path from "path"

@@ -42,11 +42,7 @@ export const runLibOptimize = async (
     ]
   })
 
-  let importMap:{
-    imports:{ [name:string]: string }
-  } = {
-    imports:{}
-  }
+  let importMap:{ [name:string]: string } = {};
   const importMapPath = join(config.build.packagesDir, 'import-map.json')
   const { outputFiles=[], warnings } = buildResult;
   // console.log(buildResult);
@@ -56,11 +52,11 @@ export const runLibOptimize = async (
     // console.log(name,module.path);
     if(entryPoints.includes(name)){
       const _modulesPath = relative(config.build.packagesDir,module.path);
-      importMap.imports[name] = _modulesPath[0]==="."?_modulesPath:`./${_modulesPath}`;
+      importMap[name] = _modulesPath[0]==="."?_modulesPath:`./${_modulesPath}`;
     }
     if(name === "components"){
       const _modulesPath = relative(config.build.packagesDir,module.path);
-      importMap.imports["@revite/components"] = _modulesPath[0]==="."?_modulesPath:`./${_modulesPath}`;
+      importMap["@revite/components"] = _modulesPath[0]==="."?_modulesPath:`./${_modulesPath}`;
     }
     if(!existsSync(module.path)){
       ensureFileSync(module.path);

@@ -1,5 +1,5 @@
 import React from "react"
-import { useRoutes } from "react-router-dom"
+import { useRoutes } from "react-router-dom";
 import { useRevite } from "./context.js"
 
 export const Routes: React.FC = () => {

@@ -1,14 +1,14 @@
 import glob from "glob"
+import { join } from "path"
+import { existsSync } from "fs"
 import { Revite } from "@revite/core"
 import { getReviteConfig } from "@revite/config"
-import WebSocket from "../notification.js"
-import ready from "../ready.js"
+import WebSocket from "../ws.js"
+import copyService from "../copy.js"
 import createWatcher from "../watch.js" 
-import { createCache } from "@revite/utils"
 import { InternalConfig, BuildResult } from "@revite/types"
-import { runLibOptimize, runInitOptimize, Builder } from "@revite/build"
+import { runOptimize, Builder } from "@revite/build"
 
-const cache = createCache();
 export default async () =>{
   
   const config: InternalConfig = await getReviteConfig({});
@@ -20,20 +20,21 @@ export default async () =>{
   // await fs.writeFile(config.packageJson, '{"type": "module"}')
 
   // 准备工作
-  await ready(config);
+  copyService(config);
 
-  // console.log("config", config);
-  await runInitOptimize(config,log);
-  // await runLibOptimize(config,[
-  //   "react",
-  //   "react-dom",
-  //   'react-dom/server',
-  //   "react-router-dom",
-  //   "react-router-dom/server",
-  //   "history",
-  //   "@revite/components",
-  // ])
-  // return;
+  const inputs = [
+    'react', 
+    'react-dom',
+    'react-dom/server',
+    "history",
+    "react-router-dom",
+    "react-router-dom/server",
+    "@revite/components",
+    "styled-components",
+    "@material-ui/core",
+    "@material-ui/core/styles"
+  ]
+  await runOptimize(inputs,config);
 
   // 业务代码
   const buildFiles = glob.sync(
@@ -44,6 +45,15 @@ export default async () =>{
       cache: { path: "FILE" }
     },
   );
+  const hookFiles = glob.sync(
+    `${config.hooksDir}/**/*`,
+    { 
+      nodir:true,
+      absolute: false,
+      cache: { path: "FILE" }
+    },
+  );
+
   buildFiles.push(config.htmlPath);
 
   const watcher = createWatcher(revite);
@@ -51,25 +61,38 @@ export default async () =>{
   const builder = await new Builder(revite).ready();
 
   // hmr-ws
-  const ws = new WebSocket(revite.serve.server);
+  const ws = new WebSocket(revite);
 
   // 应用初始构建
   const buildResult: BuildResult[] = await builder.build(buildFiles);
+
+  // 注册hooks
+  if(hookFiles.length>0){
+    const buildResult: BuildResult[] = await builder.build(hookFiles,{ outputDir: config.build.outputDir });
+    const hooksPath = join(config.build.outputDir,"/hooks/index"+config.build.outputExt);
+    if(existsSync(hooksPath)){    
+      const { default: addHook } = await import(hooksPath);
+      await addHook(revite);
+    }
+  }
   
   // 通知客户端
-  revite.subscribe("notification:hmr", async (options:any) =>{
+  revite.hook("notification:hmr", async (options:any) =>{
     ws.send(options);
   })
 
   // 打包裸模块
-  revite.subscribe("build:module", async (options:any)=>{
-    await runInitOptimize(config);
-    // await runOptimize(options);
+  revite.hook("build:module", async (options:any)=>{
+    await runOptimize(options,config);
   })
 
   // 打包业务代码
-  revite.subscribe("build:general", async ({ file, fileLoc, type }:any) =>{
-    const buildResult: BuildResult[] = await builder.build([file]);
+  revite.hook("build:general", async ({ file, fileLoc, type }:any) =>{
+    const options:any = {};
+    if(file.includes("hooks/")){
+      options.outputDir = config.build.serverDir;
+    }
+    const buildResult: BuildResult[] = await builder.build([file],options);
     const { accessPath } = buildResult[0];
     if(type==="add"){
       log.info(`add new file ${fileLoc}`,{ markText: "hmr:add" });
@@ -86,17 +109,8 @@ export default async () =>{
   // build:routes
   // await buildRoutes();
 
-  // const routesPath = path.join(paths.appBuild, "/routes.js");
-  // const routes = await require(routesPath);
-  // console.log("routes",routes);
-  
-  // running / ready
   console.log("ready....");
   await revite.ready()
 
-  // run:build
-
-  // run:build:after
-
-  console.log("dev....");
+  return revite;
 }

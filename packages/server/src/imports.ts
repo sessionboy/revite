@@ -14,7 +14,7 @@ export default async (config: InternalConfig)=>{
     let imports = modulesMap.get("imports");
     if(!imports){
       const meta = require(config.build.metaPath);
-      imports = meta.imports;
+      imports = meta;
       modulesMap.set("imports",imports);
     }
     

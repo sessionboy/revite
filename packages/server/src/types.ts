@@ -1,19 +1,25 @@
-import Koa, { DefaultState, DefaultContext } from 'koa'
 import { Server } from 'http'
+import { Server as ConnectApp } from 'connect'
+import { Revite } from '@revite/core'
 import { InternalConfig } from "@revite/types"
 
 export type ServerPlugin = (ctx: ServerPluginContext) => void
 
 export interface ServerPluginContext {
-  root: string
-  app: Koa<State, Context>
-  server: Server
-  renderer: Function
+  revite: Revite,
+  app: ConnectApp
+  server: Server|null
   routes: Array<any>
-  options: InternalConfig
-  port: number
+  modules?: SsrModules
+  config: InternalConfig
 }
 
-export interface State extends DefaultState {}
-
-export type Context = DefaultContext & ServerPluginContext
+interface SsrModules {
+  React: any
+  renderToString: Function
+  renderToNodeStream: Function
+  StaticRouter: any
+  useRoutes: any
+  Routes:any
+  Route:any
+}

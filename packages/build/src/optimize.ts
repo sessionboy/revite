@@ -40,7 +40,10 @@ export const runInitOptimize = async (config:InternalConfig,log?:any)=>{
       "history",
       "react-router-dom",
       "react-router-dom/server",
-      "@revite/components"
+      "@revite/components",
+      "styled-components",
+      "@material-ui/core",
+      "@material-ui/core/styles"
     ]
   }
   const result = await install(
@@ -61,7 +64,7 @@ export const runInitOptimize = async (config:InternalConfig,log?:any)=>{
 }
 
 let newLockfile: ImportMap | null = null;
-export const runOptimize = async (modules:Array<string>, config:any) =>{
+export const runOptimizes = async (modules:Array<string>, config:any) =>{
   const spinner = ora('start optimizing...').start();  
   console.log(modules);
   const result = await install(

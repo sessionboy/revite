@@ -1,4 +1,4 @@
-import Servable,{ servableFn } from "servable"
+import Servable from "servable"
 import { Server } from "@revite/server"
 import { InternalConfig } from "@revite/types"
 import { Logger } from "@revite/utils"
@@ -8,7 +8,7 @@ export class Revite extends Servable {
   private _initCalled:any = false;
   public config: InternalConfig
   public serve:any;
-  public handler:any;
+  public render:any;
   public meta:any = {}
   public log: Logger;
 
@@ -21,17 +21,12 @@ export class Revite extends Servable {
     this._initServer()
   }
 
-  // 等同于subscribe，但仅提供于用户使用
-  hook(type: string, fn: servableFn){
-    return this.subscribe(type, fn);
-  }
-
   _initServer () {
     if (this.serve) {
       return
     }
     this.serve = new Server(this);
-    this.handler = this.serve.app;
+    this.render = this.serve.app;
   }
 
   ready () {

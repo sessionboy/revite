@@ -88,6 +88,6 @@ export const injectHtmlReactRefreshCode = () =>{
   window.$RefreshReg$ = () => {};
   window.$RefreshSig$ = () => (type) => type;
 </script>
-<script type="module" src="/service/hmr-error-overlay.js"></script>
+<script type="module" src="/service/overlay.js"></script>
 `
 }

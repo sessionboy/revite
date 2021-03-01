@@ -6,40 +6,41 @@ import { styleReg } from "@revite/config"
 import LRU from "lru-cache"
 import { ServerPluginContext } from "../types.js"
 import { injectHmrCode } from "../hmr.js"
+import { send } from "../send.js"
 
 const require = createRequire(import.meta.url);
 const { transformSync } = require('@babel/core');
 
 const ignorePaths = [
   "/service/hmr.js",
-  "/service/hmr-error-overlay.js"
+  "/service/overlay.js"
 ]
 
 const proxy = ".proxy.js";
 const cache = new LRU<string, string>();
 
 export default (context: ServerPluginContext)=>{
-  const config = context.options;
+  const config = context.config;
   const isProd = process.env.NODE_ENV === "production";
 
-  context.app.use(async (ctx,next)=>{
-    const pathname = parse(ctx.url).pathname||"";
+  context.app.use(async (req, res, next)=>{
+    const url = req.url||"/";
+    const pathname = parse(url).pathname||"";
     if(pathname.endsWith(".js")){
       const _path = join(config.build.outputDir,pathname);
       let contents = readFileSync(_path, "utf-8"); 
-      ctx.type = 'js';
       
       // 如果已缓存，则从缓存读取
       const cacheCode = cache.get(contents);
       if(cacheCode){        
-        ctx.body = cacheCode;
+        send(req, res, cacheCode, "js");
         return;
       }
 
       // 裸模块和service不需要注入hmr代码
       if(ignorePaths.includes(pathname) || pathname.includes("/@packages")){
         cache.set(contents, contents);
-        ctx.body = contents;        
+        send(req, res, contents, "js");  
         return;
       }
 
@@ -71,7 +72,7 @@ export default (context: ServerPluginContext)=>{
 
       // 缓存新代码
       cache.set(contents, code);
-      ctx.body = code;        
+      send(req, res, code, "js");  
     }else{
       next();
     }

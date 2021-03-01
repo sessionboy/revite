@@ -11,12 +11,23 @@ export const getReviteConfig = async (options:any):Promise<InternalConfig> => {
   let config: ReviteConfig = await loadConfig();
   const root = config.root||process.cwd();
   const build = mergeBuild(config,root);
+  const cli = Boolean(process.env.CLI);
+
+  const port = config.server?.port||3000;
+  const host = config.server?.host||"localhost";
+
   return {
     root,
     appSrc: resolveApp(root,'src'),
     publicPath: resolveApp(root,'public'),
     packageJson: resolveApp(root,'package.json'),
+    nodeModulesDir: resolveApp(root,'node_modules'),
     htmlPath: config.htmlPath||resolveApp(root,'public/index.html'),
+    hooksDir: resolveApp(root,'hooks'),
+    hmr:{
+      host: config.hmr?.host||host,
+      port: config.hmr?.port||cli? port: 23697
+    },
     alias:{
       ...config.alias||{},
       "@@": root,
@@ -24,8 +35,8 @@ export const getReviteConfig = async (options:any):Promise<InternalConfig> => {
     },
     ssr: mergeSSr(config, build, root),
     server:{
-      host: config.server?.host||"localhost",
-      port: 3000,
+      host,
+      port,
       open: true,
       https: config.server?.https,
       proxy: config.server?.proxy
@@ -91,8 +102,10 @@ export const mergeBuild = ({ build={} }: ReviteConfig, root:string):any =>{
     outputExt: ".js",
     packages: "@packages",
     packagesDir: resolveApp(outputDir, "@packages"),
-    meta: "@packages/import-map.json",
-    metaPath: resolveApp(outputDir, "@packages/import-map.json"),
+    buildMap: "build-map.json",
+    buildMapPath: resolveApp(outputDir, "@packages/build-map.json"),
+    meta: "meta.json",
+    metaPath: resolveApp(outputDir, "@packages/meta.json"),
     client: "client",
     clientDir: resolveApp(outputDir, "client"),
     server: "server",

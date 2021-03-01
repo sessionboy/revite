@@ -1,5 +1,6 @@
 import fs from "fs"
-import { resolve, parse, join, dirname, extname } from "path"
+import os from 'os'
+import { resolve, posix, parse, join, dirname, extname } from "path"
 import { Readable } from 'stream'
 
 export const resolveApp = (...args: string[]) => resolve(...args);
@@ -80,7 +81,7 @@ export const replaceExt = (path:string, ext: string) =>{
   const _ext = extname(path);
   if(_ext === ext) return path;
   const paths = parse(path);
-  return join(paths.dir, paths.name, ext);
+  return `${paths.dir}/${paths.name}${ext}`;
 }
 
 
@@ -103,4 +104,14 @@ export function lookupFile(
 
 export function isObject(value: unknown): value is Record<string, any> {
   return Object.prototype.toString.call(value) === '[object Object]'
+}
+
+const isWindows = os.platform() === 'win32'
+
+export function slash(p: string) {
+  return p.replace(/\\/g, '/')
+}
+
+export function normalizePath(id: string): string {
+  return posix.normalize(isWindows ? slash(id) : id)
 }

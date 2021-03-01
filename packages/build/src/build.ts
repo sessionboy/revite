@@ -1,7 +1,7 @@
-import { join, extname } from "path"
+import { join, extname, relative } from "path"
 import fsExtra from "fs-extra"
 import { Revite } from "@revite/core"
-import { getType } from "@revite/utils"
+import { getType, replaceExt } from "@revite/utils"
 import { 
   InternalConfig,
   Plugin, 
@@ -17,6 +17,10 @@ const { writeFileSync, copySync, ensureFile, existsSync } = fsExtra;
 
 const pluginCaches = new Map<string, Plugin[]>();
 
+interface BuildOptions {
+  outputDir: string
+}
+
 export default class Builder {
   private revite: Revite;
   private config: InternalConfig;
@@ -31,7 +35,7 @@ export default class Builder {
       cache: {},
       log: revite.log,
       dispacthError: (payload: HMRError)=>{
-        revite.dispacth(
+        revite.callHook(
           "notification:hmr", 
           { ...payload, type: "error"}
         );
@@ -44,9 +48,10 @@ export default class Builder {
     return this;
   }
 
-  async build(filePaths: string[], type?: "node"|"web"): Promise<BuildResult[]> {
+  async build(filePaths: string[], options?:BuildOptions): Promise<BuildResult[]> {
     const buildPromise = filePaths.map(async (filePath: string) => {
       const fileExt = extname(filePath);      
+      const buildOptions = this.config.build;
 
       // 1，根据filter查找符合的插件
       let plugins = pluginCaches.get(filePath)||[];
@@ -73,14 +78,15 @@ export default class Builder {
       }
       // 如果有多个load插件，则取最后一个
       const loadPlugin = loadPlugins[loadPlugins.length - 1];
-      const outputExt = loadPlugin.outputExt||getOutputExt(fileExt);
-      if(!outputExt){
-        return Promise.resolve(null);
-      }
+      const outputExt = buildOptions.outputExt; 
       const write = loadPlugin.write;
-      const outputDir = this.config.build.clientDir;
-      const { relativePath } = this.relativePath(filePath, outputExt)          
-      let outputPath = join(outputDir, relativePath);          
+      const _outputDir = options?.outputDir||this.config.build.clientDir;   
+      const relativePath = relative(
+        this.config.root, 
+        replaceExt(filePath,outputExt)
+      ).replace("src/",'');
+
+      let outputPath = join(_outputDir, relativePath);          
 
       // 3，加载文件内容，并用esbuild做初始编译      
       const { code, map, warnings }:any = await loadPlugin.load(filePath);     

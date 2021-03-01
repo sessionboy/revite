@@ -1,13 +1,16 @@
 import { extname } from 'path'
 import { parse } from 'url';
+import { IncomingMessage, ServerResponse } from 'http'
 import { InternalConfig } from '@revite/types';
 import { ServerPluginContext } from "../types.js"
 import { runtimeCode, runtimePublicPath } from "../hmr.js"
 import ssrRender from "../ssr/ssrRender.js"
 import spaRender from "../ssr/spaRender.js"
+import { send } from "../send.js"
 
 export interface RenderProps {
-  ctx: any
+  req: IncomingMessage
+  res: ServerResponse
   context: ServerPluginContext
   config: InternalConfig
   url: string
@@ -16,26 +19,26 @@ export interface RenderProps {
 }
 
 export default (context: ServerPluginContext)=>{
-  const config = context.options;
+  const config = context.config;
   const isProd = process.env.NODE_ENV === "production";
 
-  context.app.use(async (ctx,next)=>{
-    const url = parse(ctx.url);
+  context.app.use(async (req, res, next)=>{
+    const url = parse(req.url||"/");
     const pathname = url.pathname||"";     
 
     // /@react-refresh
     if(pathname == runtimePublicPath && !isProd){
-      ctx.type = 'js';
-      ctx.body = runtimeCode;
+      send(req, res, runtimeCode, "js");
       return;
     }
 
     if(pathname == "/" || !extname(pathname)){    
       const renderProps: RenderProps = {
-        ctx,
+        req,
+        res,
         context,
         config,
-        url: ctx.url,
+        url: req.url||"/",
         pathname,
         isProd
       }  

@@ -1,5 +1,8 @@
+import { join } from "path"
+import { existsSync, unlinkSync } from "fs"
 import chokidar,{ FSWatcher } from "chokidar"
 import { Revite } from "@revite/core"
+import { replaceExt } from "@revite/utils"
 import { HmrType } from "@revite/types"
 
 export default (revite: Revite): FSWatcher =>{
@@ -8,10 +11,10 @@ export default (revite: Revite): FSWatcher =>{
   const onFileChange = (file: string, fileLoc: string, type: HmrType) =>{
     if(type == "unlink"){
       log.info(`remove file ${fileLoc}`,{ markText: "hmr:remove" });
-      revite.dispacth("notification:hmr",{ type: "reload" });
-      return ;
+      revite.callHook("notification:hmr",{ type: "reload" });
+    }else{
+      revite.callHook("build:general",{ file, type, fileLoc });
     }
-    revite.dispacth("build:general",{ file, type, fileLoc });
   }
 
   const watcher = chokidar.watch(["."], {
@@ -32,6 +35,16 @@ export default (revite: Revite): FSWatcher =>{
   watcher.on('unlink', (fileLoc) => {
     const filePath = config.root + `/${fileLoc}`;   
     onFileChange(filePath, fileLoc, "unlink");
+
+    // 删除该文件
+    const outputExt = config.build.outputExt;
+    const rfile = join(
+      config.build.clientDir, 
+      replaceExt(fileLoc,outputExt).replace("src/",'')
+    );
+    if(existsSync(rfile)){
+      unlinkSync(rfile);
+    }
   });
 
   // 更改文件

@@ -1,7 +1,6 @@
 import { Logger } from "@revite/utils"
 import { InternalConfig } from "./revite"
 import { HMRError } from "./hmr"
-import { servableFn } from "servable"
 
 export type initFn = (options:any) => Promise<any>
 export type filterFn = (options:any) => boolean

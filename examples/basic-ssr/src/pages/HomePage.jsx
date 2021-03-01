@@ -1,18 +1,32 @@
 import React,{ useState } from 'react';
 import { Link, Outlet } from "react-router-dom"
+import { Head } from "@revite/components"
+import { Button } from '@material-ui/core';
+// import styled from "styled-components";
 import Sider from "./Sider";
 import logo192 from './logo192.png';
 import "./home.css";
 
+// const StyleButton = styled.button`
+//   color: #f66;
+// `;
+
 export default function HomePage(props) {
   const [count,setCount] = useState(2223);
   const { user={} } = props;
-  console.log("home:data",props)
+  // console.log("home:data",props)
   return (
     <div className="home">
-     <h3>这里是首页 开心哈哈哈</h3>
+     <Head>
+        <title>Ssr App title</title>
+        <meta charSet="UTF-8" />
+        <meta property="og:title" content="My page title2333" key="title" />
+     </Head>
+     <h3>这里是首页 啊哈</h3>
      <div className="main">
        <div className="content">
+        <Button variant="contained" color="primary">我是按钮</Button>
+        {/* <StyleButton>style button</StyleButton> */}
         <img src={logo192} className="image" alt="logo" />
         hello 我是 {user.name} , 年龄 {user.age}
         <p><Link to="/concat">联系我们 </Link></p>

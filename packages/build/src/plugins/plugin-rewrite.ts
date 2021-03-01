@@ -26,20 +26,21 @@ export default async ({ config }: PluginOptions): Promise<Plugin> => {
         return fileContents;
       }
       for (const _import of imports.reverse()) {
-        let spec = fileContents.substring(_import.s, _import.e);
-        if (_import.d > -1) {                   
+        const { s, e, ss, se, d } = _import;
+        let spec = fileContents.substring(s, e);
+        if (d > -1) {                   
           spec = matchDynamicImportValue(spec) || '';
         }
         // 裸模块，例如react、react-dom
         if(isBare(spec)){
-          const modulePath = metaJson.imports[spec];
+          const modulePath = metaJson[spec];
           if(modulePath){
             const relativePath = relative(
               dirname(outputPath),
               config.build.packagesDir
             );
             const _path = join(relativePath, modulePath);            
-            rewrittenCode = spliceString(rewrittenCode, _path, _import.s, _import.e);
+            rewrittenCode = spliceString(rewrittenCode, _path, s, e);
           }else{
             // 未优化的裸模块
           }            
@@ -68,10 +69,10 @@ export default async ({ config }: PluginOptions): Promise<Plugin> => {
           }
           
           // dynamic动态模块
-          if (_import.d > -1) {
+          if (d > -1) {
             _path = JSON.stringify(_path);
           }
-          rewrittenCode = spliceString(rewrittenCode, _path, _import.s, _import.e);
+          rewrittenCode = spliceString(rewrittenCode, _path, s, e);
         }         
       }
       return { fileContents: rewrittenCode };

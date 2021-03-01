@@ -5,25 +5,30 @@ import { HMRMessage } from "@revite/types"
 export default class Socket {
   public ws: WebSocket.Server;
   private server: Server;
-  constructor(
-    server: Server, 
-    options: WebSocket.ServerOptions={ noServer: true }
-  ){
+  
+  constructor(revite: any){
+    const cli = Boolean(process.env.CLI);
+    this.server = revite.serve.server;
+    let options: WebSocket.ServerOptions = { noServer: true }
+    if(!cli){
+      options = { port : revite.config.hmr.port }
+    }
     const ws = new WebSocket.Server(options);    
     this.ws = ws;
-    this.server = server;
     this.ready();
   }
 
   ready(){
-    this.server.on('upgrade', (req, socket, head) => {
-      if (req.headers['sec-websocket-protocol'] === 'revite-hmr') {
-        this.ws.handleUpgrade(req, socket, head, (ws) => {
-          this.ws.emit('connection', ws, req)
-        })
-      }
-    })
-
+    if(this.server){
+      this.server.on('upgrade', (req, socket, head) => {
+        if (req.headers['sec-websocket-protocol'] === 'revite-hmr') {
+          this.ws.handleUpgrade(req, socket, head, (ws) => {
+            this.ws.emit('connection', ws, req)
+          })
+        }
+      })
+    }
+    
     this.ws.on('connection', (socket) => {
       socket.send(JSON.stringify({ type: 'connected' }))     
     })

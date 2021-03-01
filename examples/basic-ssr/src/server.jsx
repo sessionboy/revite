@@ -28,3 +28,13 @@ export const getInitialProps = () =>{
     }
   }
 }
+
+export default (req, res, context)=>{
+  return (
+    <ReviteServer context={context}>
+      <Document>
+        <Routes />  
+      </Document>      
+    </ReviteServer>    
+  )
+}
