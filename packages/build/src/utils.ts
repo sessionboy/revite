@@ -2,9 +2,9 @@ import { Message } from "esbuild"
 import chalk from 'chalk'
 import { mediaReg, styleReg, scriptReg, htmlReg } from "./plugins/config.js"
 
-export const getOutputExt = (ext: string)=>{
+export const getOutputExt = (ext: string, outputExt:string)=>{
   if(scriptReg.test(ext)){
-    return ".js"
+    return outputExt;
   }
   if(styleReg.test(ext)){
     return ".css"

@@ -1,9 +1,10 @@
 import { readFileSync } from "fs"
 import { extname } from "path"
-import esbuild from "esbuild"
-import { Plugin, PluginOptions } from "@revite/types"
+import esbuild,{ Message } from "esbuild"
+import { Plugin } from "../types.js"
 import { scriptReg } from "./config.js"
-import { handleEsbuildError, cleanStack } from "../error.js"
+import { prettifyMessage } from "../utils.js"
+import { DESTRUCTION } from "dns"
 const { startService } = esbuild; 
 
 const splitRE = /\r?\n/
@@ -20,7 +21,8 @@ const getLoader = (filePath: string): 'js' | 'jsx' | 'ts' | 'tsx' => {
   return ext.substr(1) as 'jsx' | 'ts' | 'tsx';
 }
 
-export default async ({ dispacthError, log }: PluginOptions): Promise<Plugin> => {
+const cacheCode = new Map();
+export default ({ config }:any): Plugin => {
   return {
     name: "@revite/plugin-esm",
     filter: scriptReg,
@@ -28,24 +30,24 @@ export default async ({ dispacthError, log }: PluginOptions): Promise<Plugin> =>
       const service = await startService();
       const contents = readFileSync(filePath,"utf8");
 
-      // 缓存文件内容，以便启动时过滤未更改且已编译的文件
-      // config.cache(filePath, contents);
-      
+      const cacheContents = cacheCode.get(contents);
+      if(cacheContents){
+        return cacheContents;
+      }
+  
       try {
         const result = await service.transform(contents, {
           loader: getLoader(filePath)
         });
+        cacheCode.set(contents, result);
         return result;
       } catch (e) {   
-        const err = handleEsbuildError({ err: e, filePath, contents,log })        
-        if(err.frame){          
-          dispacthError({ 
-            title: "Build error: @revite/plugin-esm",
-            errorMessage: err.frame,
-            fileLoc: filePath,
-            errorStackTrace: err.stack            
-          });
-          throw cleanStack(err.stack);
+        if (e.errors) {
+          e.frame = ''
+          e.errors.forEach((m: Message) => {
+            e.frame += `\n` + prettifyMessage(m, contents)
+          })
+          e.loc = e.errors[0].location
         }
         throw e;
       } finally {

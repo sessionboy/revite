@@ -1,17 +1,22 @@
 import { createRequire } from "module"
-import { Plugin, InternalConfig, PluginOptions } from "@revite/types"
+import { Plugin } from "../types.js"
 import { scriptReg } from "./config.js"
 import { getHmrCode } from "./util.js"
 
 const require = createRequire(import.meta.url);
 const babel = require('@babel/core');
 
-export default async (options: PluginOptions): Promise<Plugin> => {
+const cacheHtml = new Map();
+export default (options: any): Plugin => {
   return {
     name: "@revite/plugin-hmr",
     filter: scriptReg,
-    transform: async ({ fileContents, filePath })=> {
-      let { code } = await babel.transformAsync(fileContents, {
+    transform: async (code, id)=> {
+      const cacheContents = cacheHtml.get(code);
+      if(cacheContents){
+        return { code: cacheContents }
+      }
+      let result = await babel.transformAsync(code, {
         ast: false,
         compact: false,
         sourceMaps: false,
@@ -22,8 +27,9 @@ export default async (options: PluginOptions): Promise<Plugin> => {
           require('@babel/plugin-proposal-class-properties')
         ],
       });
-      const _code = getHmrCode(filePath, code);      
-      return { fileContents: _code }
+      const _code = getHmrCode(id, result.code);     
+      cacheHtml.set(code, _code); 
+      return { code: _code }
     }
   }
 }

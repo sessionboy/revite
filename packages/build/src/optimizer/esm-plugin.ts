@@ -2,13 +2,11 @@ import { PluginBuild, Plugin } from "esbuild"
 import lexer from 'es-module-lexer'
 import { relative } from "path"
 import { InternalConfig } from "@revite/types"
-import { normalizePath } from "@revite/utils"
+import { normalizePath, generateOutId } from "@revite/utils"
 import { MapProps } from "./resolve.js"
 import fsExtra from 'fs-extra';
 const { parse } = lexer;
 const { readFileSync } = fsExtra;
-
-export const flattenId = (id: string) => id.replace(/[\/]/g, '_')
 
 export default (
   config: InternalConfig, 
@@ -21,8 +19,7 @@ export default (
       build.onResolve({ filter: /.*/ }, args => {          
         if (args.kind === 'entry-point') {
           const input =entryPointMaps[args.path];
-          const id = flattenId(input);
-          const path = id.endsWith(".js") ? id : id+".js";   
+          const path = generateOutId(input);
 
           // 保存meta信息，例如 { "react": "react_index.js" }
           metaMap[input] = path;
@@ -48,7 +45,7 @@ export default (
         if (cjs) {
           // export * from "${_path}"语法对于commonjs无效
           // 因此需要手动填充export导出
-          const keys = Object.keys(require(entryPointMaps[path])).join(', ');        
+          const keys = Object.keys(require(path)).join(', ');        
           contents = `
             export { ${keys} } from "${relativePath}";
             export default require("${relativePath}");`

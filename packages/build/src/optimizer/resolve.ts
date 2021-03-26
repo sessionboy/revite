@@ -5,8 +5,8 @@ import { URL } from "url"
 /**
  * 通过esbuild解析依赖包的真实入口路径
  *
- * @param {string} [id] 依赖包的id. 比如react, react-dom等
- * @param {string} [resolveDir] 解析的根目录
+ * @param {string} [id] 依赖包的名称. 比如react, react-dom等
+ * @param {string} [resolveDir] node_modules所在的根目录
  * @returns {string} 依赖包的真实入口路径
  */
 const __filename = new URL(import.meta.url).pathname;
@@ -22,6 +22,7 @@ export const resolveRealPath = async (id:string, resolveDir = process.cwd())=> {
         bundle: true,
         format: 'esm',
         logLevel: 'silent',
+        absWorkingDir: resolveDir,
         stdin: {
           contents: `import ${JSON.stringify(id)}`,
           loader: 'js',
@@ -65,7 +66,7 @@ export const resolveRealPaths = async (
     }
     return !module;
   });
-  
+
   await Promise.all(inputs.map(async (m)=>{
     const _path: any = await resolveRealPath(m,config.root);
     entryPoints[m] = _path

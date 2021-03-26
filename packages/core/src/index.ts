@@ -9,9 +9,8 @@ export class Revite extends Servable {
   public config: InternalConfig
   public serve:any;
   public render:any;
-  public meta:any = {}
   public log: Logger;
-
+ 
   constructor(config: InternalConfig){
     super();
     this.config = config;
@@ -34,10 +33,6 @@ export class Revite extends Servable {
       this._ready = this._init()
     }
     return this._ready
-  }
-
-  setMeta(key: string, value: string){
-    this.meta[key] = value;
   }
 
   async _init () {

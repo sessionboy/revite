@@ -5,6 +5,7 @@ import { Button } from '@material-ui/core';
 // import styled from "styled-components";
 import Sider from "./Sider";
 import logo192 from './logo192.png';
+import logo from './logo.svg';
 import "./home.css";
 
 // const StyleButton = styled.button`
@@ -28,6 +29,7 @@ export default function HomePage(props) {
         <Button variant="contained" color="primary">我是按钮</Button>
         {/* <StyleButton>style button</StyleButton> */}
         <img src={logo192} className="image" alt="logo" />
+        <img src={logo} className="image" alt="logo" />
         hello 我是 {user.name} , 年龄 {user.age}
         <p><Link to="/concat">联系我们 </Link></p>
         <p><Link to="/about">关于我们</Link></p>

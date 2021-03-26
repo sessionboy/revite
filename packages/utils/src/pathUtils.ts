@@ -3,12 +3,6 @@ import { URL } from "url"
 import qs, { ParsedUrlQuery } from 'querystring'
 import resolve from 'resolve'
 
-export const queryRE = /\?.*$/
-export const hashRE = /#.*$/
-
-export const cleanUrl = (url: string) =>
-  url.replace(hashRE, '').replace(queryRE, '')
-
 // export const parseWithQuery = (
 //   id: string
 // ): {

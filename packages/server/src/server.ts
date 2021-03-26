@@ -7,7 +7,7 @@ import serve from "serve-static"
 import { Server as HttpServer } from "http"
 import { ServerPlugin } from "./types"
 import getPlugins from "./plugins/index.js"
-import createServer from "./createServer.js"
+import createServer from "./http.js"
 import ImportModules from "./imports.js"
 
 export default class Server {

@@ -3,7 +3,7 @@ import { readFileSync } from "fs"
 const require = createRequire(import.meta.url);
 
 export const getHmrCode = (filePath: string, code: string) =>{
-  return `import * as  __REVITE_HMR__ from '/service/hmr.js';
+  return `import * as  __REVITE_HMR__ from '/hmr.js';
 import.meta.hot = __REVITE_HMR__.createHotContext(import.meta.url);
 
 /** React Refresh: Setup **/
@@ -53,12 +53,12 @@ export const getHtmlReactRefreshCode = () =>{
     window.$RefreshSig$ = () => (type) => type;
   }
 </script>
-<script type="module" src="/service/overlay.js"></script>
+<script type="module" src="/overlay.js"></script>
 `
 }
 
 
-export const getStyleHmrCode = (code: string, outputPath: string) =>{
+export const getStyleHmrCode = (code: string) =>{
   return `const code = ${JSON.stringify(code)};
 
 if (typeof document !== 'undefined') {

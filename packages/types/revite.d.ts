@@ -71,6 +71,7 @@ export interface InternalConfig {
   htmlPath: string
   hooksDir: string
   hmr: HmrOptions
+  dev: boolean
   ssr?: {
     mode: "stream"|"general"
     routeType: "config"|"file"
@@ -91,6 +92,7 @@ export interface InternalConfig {
     https?: ServerOptions
     proxy?: Record<string, any>
     open: boolean
+    cors: object
   },
   build: {
     /** 

@@ -9,6 +9,7 @@
   },
   "include": ["./src"],
   "exclude": [
+    "./src/plugins-o/*",
     "**/*.copy.ts",
     "./src/optimizer/optimizer"
   ]

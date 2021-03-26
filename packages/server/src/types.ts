@@ -1,12 +1,24 @@
 import { Server } from 'http'
-import { Server as ConnectApp } from 'connect'
 import { Revite } from '@revite/core'
+import { Server as ConnectApp } from 'connect'
 import { InternalConfig } from "@revite/types"
+import WebSocket from "./ws.js"
 
 export type ServerPlugin = (ctx: ServerPluginContext) => void
+export type ServerMiddleware = (ctx: ServerContext) => void
+
+export interface ServerContext {
+  revite: Revite
+  config: InternalConfig
+  app: ConnectApp
+  server: Server|null
+  routes: Array<any>
+  modules?: SsrModules
+  ws: WebSocket
+}
 
 export interface ServerPluginContext {
-  revite: Revite,
+  revite: Revite
   app: ConnectApp
   server: Server|null
   routes: Array<any>

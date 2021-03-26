@@ -8,7 +8,7 @@ global.require = createRequire(import.meta.url);
 */ 
 process.env.CLI = true;
 
-import '../dist/cli.js';
+import '../dist/cli/cli.js';
 
 // import path from "path"
 // import { createRequire } from "module"

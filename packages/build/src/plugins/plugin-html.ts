@@ -1,15 +1,13 @@
-import { join, basename } from "path"
 import fsExtra from "fs-extra"
-import { Plugin, PluginOptions } from "@revite/types"
+import { Plugin } from "../types.js"
 import { htmlReg } from "./config.js"
 import { getHtmlReactRefreshCode } from "./util.js"
-const { readFileSync, writeFileSync } = fsExtra;
+const { readFileSync } = fsExtra;
 
-export default async ({ config }: PluginOptions): Promise<Plugin> => {
+export default ({ config }: any): Plugin => {
   return {
     name: "@revite/plugin-html",
     filter: htmlReg,
-    write: false,
     load: async (filePath: string)=> {
       const code = readFileSync(filePath,"utf8");
       return {
@@ -17,13 +15,10 @@ export default async ({ config }: PluginOptions): Promise<Plugin> => {
         warnings:[]
       };
     },
-    transform: async ({ fileContents, filePath, fileExt, outputPath })=> {
-      const code = getHtmlReactRefreshCode();
-      fileContents = fileContents.replace(/<body.*?>/,code);
-      
-      const _outputPath = join(config.build.outputDir,basename(filePath));
-      writeFileSync(_outputPath, fileContents);
-      return { fileContents, outputPath: _outputPath };
+    transform: async (code, importer)=> {
+      const refreshCode = getHtmlReactRefreshCode();
+      let contents = code.replace(/<body.*?>/,refreshCode);
+      return { code: contents };
     }
   }
 }

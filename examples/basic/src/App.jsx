@@ -7,13 +7,12 @@ import { useRoutes, Routes, Route, Link } from "react-router-dom"
 import logo from './logo.svg';
 import './App.css';
 import routes from "./routes"
-import Head from "./head/head"
 // const test = import("./pages/404");
 // console.log(test);
 // console.log(router);
 console.log(routes);
 
-
+// export default
 export default function App (props) {
   const [count, setCount] = useState(0);  
   // const Routes = () =>useRoutes(routes);
@@ -32,7 +31,7 @@ export default function App (props) {
   return (
     <div className="App">            
       <header className="App-header">
-        这里是revite 
+        这里是revite 什么嘛这sss
         <Routes>
           {routes.map((route,index)=>{
             return (

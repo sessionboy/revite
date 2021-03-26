@@ -1,0 +1,31 @@
+{
+  "name": "revite-basic-ssr",
+  "version": "1.0.0",
+  "description": "> TODO: description",
+  "author": "zhihelive <xzhihe@sina.com>",
+  "homepage": "",
+  "license": "ISC",
+  "main": "lib/basic.js",
+  "type": "module",
+  "scripts": {
+    "dev": "revite dev",
+    "build": "revite build",
+    "start": "revite start",
+    "server": "nodemon ./ssr.js",
+    "web": "nodemon ./web.js"
+  },
+  "dependencies": {
+    "@revite/components": "^0.0.1",
+    "history": "^5.0.0",
+    "isomorphic-fetch": "^3.0.0",
+    "koa": "^2.13.1",
+    "koa-static": "^5.0.0",
+    "react": "17.0.0",
+    "react-dom": "17.0.0",
+    "react-router-dom": "^6.0.0-beta.0",
+    "revite": "^0.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.7"
+  }
+}

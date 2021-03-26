@@ -1,14 +1,20 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "target": "ES2019",
+    "allowJs": true,
+    "jsx": "react",
+    "target": "ESNext",
     "outDir": "dist",
     "module": "esnext", 
-    "lib": ["ESNext"],
+    "lib": ["ESNext","DOM"],
     "resolveJsonModule": true,
     "sourceMap": true
   },
-  "include": ["./src"],
+  "include": [
+    "./cli",
+    "./server",
+    "./core"
+  ],
   "exclude": [
     "**/*.copy.ts"
   ]

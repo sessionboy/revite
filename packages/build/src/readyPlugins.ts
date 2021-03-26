@@ -6,13 +6,15 @@ import {
   esmPlugin,
   hmrPlugin, 
   rewritePlugin 
-} from "./plugins/index.js"
+} from "./plugins-o/index.js"
 import { Plugin, PluginOptions } from "@revite/types"
 
 export default async (
   revite: Revite, 
   pluginOptions: PluginOptions
 ): Promise<Plugin[]> =>{
+
+  return []
   
   const config = revite.config;
   const plugins = [

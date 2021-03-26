@@ -60,6 +60,24 @@ export const readBody = async (
   }
 }
 
+export const getFileWithExts = (
+  path: string,
+  exts: string[],
+  pathOnly = true
+): string | undefined =>{
+  let _path = path;
+  // 如果是目录，则加上/index
+  if(fs.existsSync(path)){
+    _path = join(path,"index");
+  }
+  for (const ext of exts) {
+    const fullPath = `${_path}${ext}`;   
+    if (fs.existsSync(fullPath)) {
+      return pathOnly ? fullPath : fs.readFileSync(fullPath, 'utf-8')
+    }
+  }
+}
+
 export const getFile = (
   path: string,
   formats: string[],
@@ -70,7 +88,7 @@ export const getFile = (
     path = resolveApp(path,"index");
   }
   for (const format of formats) {
-    const fullPath = join(path, format);
+    const fullPath = join(path, format);   
     if (fs.existsSync(fullPath)) {
       return pathOnly ? fullPath : fs.readFileSync(fullPath, 'utf-8')
     }
@@ -115,3 +133,16 @@ export function slash(p: string) {
 export function normalizePath(id: string): string {
   return posix.normalize(isWindows ? slash(id) : id)
 }
+
+export const flattenId = (id: string) => id.replace(/[\/]/g, '_')
+
+export function generateOutId(input: string): string {
+  const id = flattenId(input);
+  return id.endsWith(".js") ? id : id+".js";  
+}
+
+export const queryRE = /\?.*$/
+export const hashRE = /#.*$/
+
+export const cleanUrl = (url: string) =>
+  url.replace(hashRE, '').replace(queryRE, '')

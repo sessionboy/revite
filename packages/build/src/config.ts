@@ -1,5 +1,6 @@
+import { Loader } from "esbuild"
 
-export const loaders = {
+export const loaders: { [ext:string]: Loader } = {
   ".js": "js",
   ".mjs": "js",
   ".cjs": "js",
@@ -7,7 +8,7 @@ export const loaders = {
   ".ts": "ts",
   ".tsx": "tsx",
   ".json": "json",
-  ".css": 'file',
+  ".css": 'css',
   ".scss": 'css',
   ".less": 'css',
   '.png': 'file',

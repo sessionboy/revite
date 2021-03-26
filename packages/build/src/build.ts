@@ -13,6 +13,7 @@ import {
 } from "@revite/types"
 import { getOutputExt } from "./utils.js"
 import readyPlugins from "./readyPlugins.js"
+import { runOptimize } from "./optimizer/index.js"
 const { writeFileSync, copySync, ensureFile, existsSync } = fsExtra;
 
 const pluginCaches = new Map<string, Plugin[]>();
@@ -21,7 +22,7 @@ interface BuildOptions {
   outputDir: string
 }
 
-export default class Builder {
+export default class Bundler {
   private revite: Revite;
   private config: InternalConfig;
   private pluginOptions: PluginOptions;
@@ -49,11 +50,12 @@ export default class Builder {
   }
 
   async build(filePaths: string[], options?:BuildOptions): Promise<BuildResult[]> {
+    const unOptimizes: string[] = [];
     const buildPromise = filePaths.map(async (filePath: string) => {
       const fileExt = extname(filePath);      
       const buildOptions = this.config.build;
 
-      // 1，根据filter查找符合的插件
+      // 1，根据filter查找符合条件的插件
       let plugins = pluginCaches.get(filePath)||[];
       if(plugins.length == 0){                
         plugins = this.plugins.filter(({ filter }:any)=>{          
@@ -65,11 +67,13 @@ export default class Builder {
           }
           return false;
         })
+        if(plugins.length > 0){
+          pluginCaches.set(filePath, plugins);
+        }
       }      
       if(plugins.length === 0){
         return Promise.resolve(null);
-      }
-      pluginCaches.set(filePath, plugins);
+      }     
      
       // 2，获取load(加载)插件，
       const loadPlugins:any = plugins.filter(plugin=>plugin.load);
@@ -78,7 +82,10 @@ export default class Builder {
       }
       // 如果有多个load插件，则取最后一个
       const loadPlugin = loadPlugins[loadPlugins.length - 1];
-      const outputExt = buildOptions.outputExt; 
+      const outputExt = loadPlugin.outputExt||getOutputExt(fileExt, buildOptions.outputExt);
+      if(!outputExt){
+        return Promise.resolve(null);
+      }
       const write = loadPlugin.write;
       const _outputDir = options?.outputDir||this.config.build.clientDir;   
       const relativePath = relative(
@@ -125,6 +132,12 @@ export default class Builder {
       };
     })
 
+    // 构建未优化的依赖
+    if(unOptimizes.length>0){
+      await runOptimize(unOptimizes, this.config);
+    }
+
+    // 等待所有构建完成
     const buildResult:any = await Promise.all(buildPromise);
     
     // 此处添加一个构建完成的钩子
@@ -138,19 +151,5 @@ export default class Builder {
     );
     
     return buildResult;
-  }
-
-  relativePath(filePath:string, outputExt:string){
-    const ext = extname(filePath);
-    const relativePathName = filePath.substring(
-      this.config.appSrc.length,
-      filePath.lastIndexOf(ext)
-    );
-    const relativePath = relativePathName+outputExt;
-    return {
-      ext,
-      relativePathName,
-      relativePath
-    }
   }
 }

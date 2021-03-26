@@ -1,4 +1,6 @@
 import React from "react";
+import { renderToString } from "react-dom/server";
+import App from "./App"
 
 export function Document(props) {
   return (
@@ -29,11 +31,11 @@ export const getInitialProps = () =>{
   }
 }
 
-export default (req, res, context)=>{
-  return (
+export const render = (req, res, context)=>{
+  return renderToString(
     <ReviteServer context={context}>
       <Document>
-        <Routes />  
+        <App />  
       </Document>      
     </ReviteServer>    
   )

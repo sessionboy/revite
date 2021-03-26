@@ -12,6 +12,7 @@ export const getReviteConfig = async (options:any):Promise<InternalConfig> => {
   const root = config.root||process.cwd();
   const build = mergeBuild(config,root);
   const cli = Boolean(process.env.CLI);
+  const dev = process.env.NODE_ENV !== "production";
 
   const port = config.server?.port||3000;
   const host = config.server?.host||"localhost";
@@ -22,8 +23,9 @@ export const getReviteConfig = async (options:any):Promise<InternalConfig> => {
     publicPath: resolveApp(root,'public'),
     packageJson: resolveApp(root,'package.json'),
     nodeModulesDir: resolveApp(root,'node_modules'),
-    htmlPath: config.htmlPath||resolveApp(root,'public/index.html'),
+    htmlPath: config.htmlPath||resolveApp(root,'index.html'),
     hooksDir: resolveApp(root,'hooks'),
+    dev,
     hmr:{
       host: config.hmr?.host||host,
       port: config.hmr?.port||cli? port: 23697
@@ -39,7 +41,8 @@ export const getReviteConfig = async (options:any):Promise<InternalConfig> => {
       port,
       open: true,
       https: config.server?.https,
-      proxy: config.server?.proxy
+      proxy: config.server?.proxy,
+      cors: {}
     },
     build
   }

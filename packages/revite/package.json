@@ -6,7 +6,7 @@
   "homepage": "",
   "license": "ISC",
   "type": "module",
-  "main": "dist/index.js",
+  "main": "dist/cli/index.js",
   "bin": {
     "revite": "bin/revite.js"
   },
